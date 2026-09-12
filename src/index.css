@@ -1,0 +1,27 @@
+@font-face {
+  font-family: Poppins;
+  src: url("../src/assets/fonts/Poppins-Regular.ttf");
+}
+
+@import "tailwindcss";
+
+:root {
+  --toastify-color-success: #f97316;
+  --toastify-toast-success: #fff7ed;
+}
+
+@theme {
+  --font-poppins: Poppins, "sans-serif";
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.input {
+  @apply w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400;
+}
