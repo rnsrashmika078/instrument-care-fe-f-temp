@@ -59,6 +59,8 @@ export default function AllJobSummary() {
           allRequests = data;
         } else if (data && Array.isArray(data.requests)) {
           allRequests = data.requests;
+        } else if (data && Array.isArray(data.data)) {
+          allRequests = data.data;
         }
 
         setJobs(allRequests);

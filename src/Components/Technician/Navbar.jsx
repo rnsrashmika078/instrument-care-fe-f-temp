@@ -1,48 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import NationalLogo from "../../assets/images/national-logo.jpg";
 import NsfLogo from "../../assets/images/NSF-Logo.jpg";
-import profileImage from "../../assets/images/profile-image.jpeg";
-import { useNavigate } from "react-router-dom";
-import { API_BASE, HOME_BASE } from "../../config";
+import { HOME_BASE } from "../../config";
 import { doFrontendLogout } from "../auth/Logout";
 
 export default function Navbar() {
-  const navigate = useNavigate();
-  const [avatarSrc, setAvatarSrc] = useState(profileImage);
-
   const handleLogout = () => {
     doFrontendLogout();
     window.location.href = HOME_BASE;
   };
-
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const userId = sessionStorage.getItem("user_id");
-        const token = sessionStorage.getItem("token");
-
-        if (!userId) return;
-
-        const res = await fetch(`${API_BASE}/admin/profile/${userId}`, {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) return;
-
-        const data = await res.json();
-        if (data.profile_image_url) {
-          setAvatarSrc(data.profile_image_url);
-        }
-      } catch (err) {
-        console.error("Navbar profile fetch failed:", err);
-      }
-    };
-
-    loadProfile();
-  }, []);
 
   return (
     <nav className="w-full bg-white sticky top-0 z-50 shadow-sm">

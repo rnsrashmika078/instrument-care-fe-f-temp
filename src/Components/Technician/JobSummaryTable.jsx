@@ -34,7 +34,11 @@ export default function JobSummaryTable() {
 
         const data = await response.json();
 
-        const transformedData = data.map((job) => [
+        const payload = Array.isArray(data)
+          ? data
+          : data?.data ?? data?.requests ?? [];
+
+        const transformedData = payload.map((job) => [
           "SR/" + job.id,
           job.full_name,
           job.instrument_name,

@@ -28,8 +28,16 @@ export default function LoginPage() {
         body: JSON.stringify(loginData),
       });
 
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        console.error("Login failed:", text);
+        setError("Server error. Please try again later.");
+        return;
+      }
       // console.log("Login data:", loginData);
-      const result = await response.json();
       // console.log("Login Response:", result);
 
       if (result.message === "Login successful") {
