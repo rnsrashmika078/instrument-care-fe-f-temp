@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 
 import TechBg from '../../assets/images/technician-hero-bg-5.jpg';
-import Techinician from '../../assets/images/Technician-image-1.jpg';
+import Techinician from '../../assets/images/technician-image-1.jpg';
 import { Link, useNavigate } from "react-router-dom";
 
 export default function TechnicianHeader() {

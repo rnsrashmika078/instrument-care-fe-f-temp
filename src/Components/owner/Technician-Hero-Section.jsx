@@ -1,5 +1,5 @@
 import BG from '../../assets/images/technician-hero-bg-5.jpg';
-import Technician from '../../assets/images/Technician-image-1.jpg';
+import Technician from '../../assets/images/technician-image-1.jpg';
 
 export default function TechnicianHeader({ searchTerm, setSearchTerm }) {
   const handleInputChange = (e) => {

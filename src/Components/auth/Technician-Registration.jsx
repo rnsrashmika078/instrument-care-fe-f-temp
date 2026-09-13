@@ -35,7 +35,22 @@ export default function TechnicianRegisterPage() {
 
       // ✅ Navigate to verify-email page with user_id
       if (result.message === "User registered successfully. Verification email sent.") {
-        navigate("/auth/verify-email", { state: { userId: result.user_id, email: formData.email } });
+        const { user_id: userId, email_sent } = result.data || {};
+
+        // Persist so the OTP page works even after a refresh
+        if (userId) {
+          sessionStorage.setItem("verify_user_id", String(userId));
+          sessionStorage.setItem("verify_email", formData.email);
+        }
+
+        toast.success(
+          email_sent
+            ? "OTP has been sent to your email address. Please verify to complete registration."
+            : "Registration successful. Please verify your email to continue.",
+          { autoClose: 5000 }
+        );
+
+        navigate("/auth/verify-email", { state: { userId, email: formData.email } });
         return;
       }
 

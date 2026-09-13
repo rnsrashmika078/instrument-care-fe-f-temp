@@ -9,8 +9,10 @@ export default function EmailVerificationPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 🔹 Get userId from navigation state
-  const { userId, email } = location.state || {};
+  // 🔹 Get userId from navigation state (fall back to sessionStorage after a refresh)
+  const { userId: stateUserId, email: stateEmail } = location.state || {};
+  const userId = stateUserId ?? sessionStorage.getItem("verify_user_id");
+  const email = stateEmail ?? sessionStorage.getItem("verify_email");
 
   useEffect(() => {
     if (!userId) {
@@ -49,6 +51,8 @@ export default function EmailVerificationPage() {
 
       if (result.message === "Verification successful") {
         setError("");
+        sessionStorage.removeItem("verify_user_id");
+        sessionStorage.removeItem("verify_email");
         navigate("/auth/login");
       } else {
         setError("Invalid OTP. Please try again!");

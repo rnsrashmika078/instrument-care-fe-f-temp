@@ -77,7 +77,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-6"
+      className="min-h-screen flex items-center justify-center px-4 sm:px-6"
       style={{ backgroundColor: "#f8fafc" }}
     >
       <div className="w-full max-w-[1020px] bg-white rounded-[18px] overflow-hidden border border-black/5 shadow-[0_16px_45px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.03)]">
