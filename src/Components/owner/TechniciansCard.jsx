@@ -9,7 +9,8 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import DefaultProfileImage from "../../assets/images/profile-image.jpeg";
-import { fetchWithAuth } from "../utils/api";
+import { API_BASE } from "../../config";
+import { fetchWithAuth, assetUrl } from "../utils/api";
 
 export default function TechniciansCard() {
   const [technicians, setTechnicians] = useState([]);
@@ -20,7 +21,7 @@ export default function TechniciansCard() {
     const fetchTechnicians = async () => {
       try {
         const response = await fetchWithAuth(
-          "http://localhost/instrument-care-back-end/public/user/dashboard/approved",
+          `${API_BASE}/user/dashboard/approved`,
           {
             method: "GET",
             headers: {
@@ -55,7 +56,7 @@ export default function TechniciansCard() {
     console.log("Payload to send:", payload);
 
     try {
-      const response = await fetch(`http://localhost/instrument-care-back-end/public/user/dashboard/search`, {
+      const response = await fetch(`${API_BASE}/user/dashboard/search`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +87,7 @@ export default function TechniciansCard() {
               // Use profile_image_url if available, otherwise default local image
               const imageUrl =
                 tech.picture !== null
-                  ? `http://localhost/instrument-care-back-end/public/${tech.picture}`
+                  ? assetUrl(tech.picture)
                   : DefaultProfileImage;
 
               return (

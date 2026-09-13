@@ -38,7 +38,7 @@ export default function Accept_Service_Request() {
         if (!response.ok) throw new Error("Failed to fetch service requests");
 
         const data = await response.json();
-        console.log("✅ Service Requests:", data);
+        console.log(" Service Requests:", data);
         setRequestData(data);
       } catch (error) {
         console.error("Error fetching service requests:", error);

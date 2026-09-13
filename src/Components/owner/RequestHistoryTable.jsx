@@ -45,7 +45,7 @@ export default function RequestHistoryTable() {
     const fetchServiceRequests = async () => {
       setLoading(true);
       try {
-        const userId = sessionStorage.getItem("user_id"); // ✅ get logged-in user ID
+        const userId = sessionStorage.getItem("user_id"); //  get logged-in user ID
         if (!userId) throw new Error("User not logged in");
 
         const response = await fetch(
@@ -56,7 +56,7 @@ export default function RequestHistoryTable() {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${token}`,
             },
-            body: JSON.stringify({ user_id: userId }), // ✅ send user_id in body
+            body: JSON.stringify({ user_id: userId }), //  send user_id in body
           }
         );
         console.log(response);
@@ -68,7 +68,7 @@ export default function RequestHistoryTable() {
           throw new Error(data.error || "No data found or server error");
         }
 
-        // ✅ Support both array and object responses
+        //  Support both array and object responses
         if (Array.isArray(data)) {
           setJobs(data);
         } else if (data.data && Array.isArray(data.data)) {

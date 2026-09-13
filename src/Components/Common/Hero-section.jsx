@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import heroBg from "../../assets/images/hero-bg-5.jpg"; // ✅ import image
+import heroBg from "../../assets/images/hero-bg-5.jpg"; //  import image
 
 export default function Hero() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export default function Hero() {
   return (
     <section
       className="relative bg-cover bg-center bg-no-repeat py-20"
-      style={{ backgroundImage: `url(${heroBg})` }} // ✅ use imported image
+      style={{ backgroundImage: `url(${heroBg})` }} //  use imported image
     >
       {/* Centered Content Layer */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 flex flex-col items-center text-center space-y-10 font-poppins">

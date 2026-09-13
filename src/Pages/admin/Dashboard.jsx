@@ -28,7 +28,7 @@ export default function Admin_Dashboard() {
         );
         const data = await response.json();
 
-        // ✅ Set backend response to chartData
+        //  Set backend response to chartData
         setChartData(data);
       } catch (error) {
         console.error('Failed to fetch line chart data:', error);

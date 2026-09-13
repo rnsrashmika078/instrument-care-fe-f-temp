@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import DefaultProfileImage from "../../assets/images/profile-image.jpeg";
-import { fetchWithAuth } from "../utils/api";
+import { fetchWithAuth, assetUrl } from "../utils/api";
 import { API_BASE } from "../../config";
 
 export default function TechnicianTable({ searchTerm, setSearchTerm }) {
@@ -163,7 +163,7 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
                 currentRecords.map((tech, index) => {
                   const imageUrl =
                     tech.picture !== null
-                      ? `${API_BASE}/${tech.picture}`
+? assetUrl(tech.picture)
                       : DefaultProfileImage;
                   return (
                     <tr key={index} className="hover:bg-gray-50 transition">
@@ -223,7 +223,7 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
             currentRecords.map((tech, index) => {
               const imageUrl =
                 tech.picture !== null
-                  ? `${API_BASE}/${tech.picture}`
+                  ? assetUrl(tech.picture)
                   : DefaultProfileImage;
               return (
                 <div

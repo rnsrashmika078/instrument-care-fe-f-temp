@@ -13,7 +13,7 @@ export default function All_Users() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ✅ Fetch Users From Backend
+  //  Fetch Users From Backend
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -27,9 +27,9 @@ export default function All_Users() {
 
         const data = await response.json();
 
-        // ✅ KEEP FULL RAW USER + ADD FORMATTED FIELDS
+        //  KEEP FULL RAW USER + ADD FORMATTED FIELDS
         const formattedUsers = data.map((user) => ({
-          ...user, // ✅ VERY IMPORTANT
+          ...user, //  VERY IMPORTANT
 
           fullName: `${user.first_name} ${user.last_name}`,
           contact: user.mobile_number,
@@ -67,13 +67,13 @@ export default function All_Users() {
         <main className="flex-1 bg-[#ffffff80] rounded-lg p-4">
           <h2 className="text-xl font-bold mb-4">All Users</h2>
 
-          {/* ✅ Loading State */}
+          {/*  Loading State */}
           {loading && <p className="text-center">Loading users...</p>}
 
-          {/* ✅ Error State */}
+          {/*  Error State */}
           {error && <p className="text-center text-red-500">{error}</p>}
 
-          {/* ✅ Data Table */}
+          {/*  Data Table */}
           {!loading && !error && <AllOwnerTable usersData={users} />}
         </main>
       </div>

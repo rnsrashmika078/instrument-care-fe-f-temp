@@ -118,7 +118,7 @@ export default function ServiceRequestForm({
     );
 
     try {
-      setLoading(true); // ✅ start loading
+      setLoading(true); //  start loading
 
       const response = await fetch(`${API_BASE}/user/service-request`, {
         method: "POST",
@@ -130,7 +130,7 @@ export default function ServiceRequestForm({
       });
 
       const data = await response.json();
-      onSend(data); // ✅ callback with response
+      onSend(data); //  callback with response
       toast.success("Service request sent successfully!");
     } catch (error) {
       toast.success("Service Request sent successfully!");
@@ -367,7 +367,7 @@ export default function ServiceRequestForm({
           <button
             type="submit"
             className="w-full md:w-1/2 bg-orange-400 text-white font-semibold py-2 rounded hover:bg-orange-500 transition flex items-center justify-center"
-            disabled={loading} // ✅ disable button when loading
+            disabled={loading} //  disable button when loading
           >
             {loading ? (
               <>

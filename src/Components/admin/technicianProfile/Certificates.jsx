@@ -1,4 +1,4 @@
-import { fetchWithAuth } from '../../utils/api';
+import { fetchWithAuth, assetUrl } from '../../utils/api';
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { API_BASE } from "../../../config";
@@ -126,16 +126,17 @@ export default function Certificates({ userId }) {
             }
 
             if (res.ok) {
-                toast.success("✅ Certificates updated successfully!");
+                toast.success(" Certificates updated successfully!");
+                setCertificates([]);
                 fetchCertificates();
             } else {
-                console.error("❌ API Error:", result);
+                console.error(" API Error:", result);
                 toast.error(
               result.message || result.error || "Failed to update Certificates",
             );
             }
         } catch (err) {
-            console.error("❌ Error updating Certificates:", err);
+            console.error(" Error updating Certificates:", err);
             toast.error("Error updating Certificates");
         } finally {
             setLoading(false);
@@ -174,7 +175,7 @@ export default function Certificates({ userId }) {
 
                         {cert.certificate_file && (
                             <a
-                                href={`${API_BASE}/${cert.certificate_file}`}
+                                href={assetUrl(cert.certificate_file)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-600 text-sm underline mt-1 inline-block"

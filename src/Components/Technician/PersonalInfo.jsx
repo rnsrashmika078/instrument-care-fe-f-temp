@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import profileImage from "../../assets/images/profile-image.jpeg";
 import { API_BASE } from "../../config";
+import { assetUrl } from "../utils/api";
 import { toast } from "react-toastify";
 
 export default function PersonalInfo() {
@@ -60,7 +61,7 @@ export default function PersonalInfo() {
           supervisor_Designation: data.supervisor_designation || "",
           supervisor_Email: data.supervisor_email || "",
           supervisor_Contact_No: data.supervisor_contact_no || "",
-          picture: data.picture ? `${API_BASE}/${data.picture}` : null,
+          picture: data.picture ? assetUrl(data.picture) : null,
           gender: data.gender || "",
           title: data.title || "",
           initials: data.name_with_initials || "",
@@ -146,7 +147,7 @@ export default function PersonalInfo() {
         toast.success("Profile updated successfully");
       } else {
         toast.error(result.error || "Update failed");
-        console.error("❌ API Error:", result);
+        console.error(" API Error:", result);
       }
 
     } catch (err) {

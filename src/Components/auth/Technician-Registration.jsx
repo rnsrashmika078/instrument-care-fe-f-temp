@@ -33,7 +33,7 @@ export default function TechnicianRegisterPage() {
       const result = await response.json();
       console.log("Registration Response:", result);
 
-      // ✅ Navigate to verify-email page with user_id
+      //  Navigate to verify-email page with user_id
       if (result.message === "User registered successfully. Verification email sent.") {
         const { user_id: userId, email_sent } = result.data || {};
 

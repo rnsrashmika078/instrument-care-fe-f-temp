@@ -20,7 +20,7 @@ export default function WhyUs() {
   return (
     <section
       className="py-16 px-4 bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${whyUsBg})` }} // ✅ replace with your path
+      style={{ backgroundImage: `url(${whyUsBg})` }} //  replace with your path
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10">
         {/* Left Image */}

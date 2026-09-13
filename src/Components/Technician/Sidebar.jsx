@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import profileImage from "../../assets/images/profile-image.jpeg";
-import { fetchWithAuth } from "../utils/api";
+import { fetchWithAuth, assetUrl } from "../utils/api";
 import { API_BASE } from "../../config";
 
 export default function Sidebar() {
@@ -51,7 +51,7 @@ export default function Sidebar() {
 
         <div className="w-20 h-20 rounded-full border-2 border-orange-200 flex items-center justify-center text-4xl mb-4 overflow-hidden bg-orange-50">
           <img
-            src={image ? `${API_BASE}/${image}` : profileImage}
+            src={image ? assetUrl(image) : profileImage}
             alt="Profile"
             className="h-full w-full object-cover"
           />

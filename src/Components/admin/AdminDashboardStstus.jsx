@@ -26,7 +26,7 @@ export default function AdminDashboardStats({ technicianId }) {
         );
         const data = await response.json();
 
-        // ✅ Update all dashboard values from backend response
+        //  Update all dashboard values from backend response
         setStats((prevStats) =>
           prevStats.map((stat) => {
             if (stat.label === "Owners") {

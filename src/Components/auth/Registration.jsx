@@ -27,7 +27,7 @@ export default function NewUserRegistration() {
   const [institutes, setInstitutes] = useState([]);
   const [faculties, setFaculties] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [designations, setDesignations] = useState([]); // ✅ NEW
+  const [designations, setDesignations] = useState([]); //  NEW
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -37,7 +37,7 @@ export default function NewUserRegistration() {
   useEffect(() => {
     document.body.style.overflow = "auto";
 
-    // ✅ FETCH INSTITUTES
+    //  FETCH INSTITUTES
     fetch(`${API_BASE}/institutes`)
       .then((res) => res.json())
       .then((data) => {
@@ -47,7 +47,7 @@ export default function NewUserRegistration() {
         console.error("Failed to fetch institutes", err);
       });
 
-    // ✅ FETCH DESIGNATIONS
+    //  FETCH DESIGNATIONS
     fetch(`${API_BASE}/designations`)
       .then((res) => res.json())
       .then((data) => {

@@ -102,13 +102,13 @@ export default function ProofDocument({ userId }) {
             }
 
             if (res.ok) {
-                toast.success("✅ Document uploaded successfully!");
+                toast.success(" Document uploaded successfully!");
                 fetchDocument();
             } else {
                 toast.error(result.error || result.message || "Upload failed");
             }
         } catch (err) {
-            console.error("❌ Error uploading document:", err);
+            console.error(" Error uploading document:", err);
             toast.error("Error uploading document");
         } finally {
             setLoading(false);

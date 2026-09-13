@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 export default function ServiceRequestTable_Request({ data, onView }) {
-  // ✅ Filter only pending requests
+  //  Filter only pending requests
   const pendingRequests = Array.isArray(data)
     ? data.filter((req) => req.status?.toUpperCase() === "PENDING")
     : [];

@@ -16,7 +16,7 @@ export default function ServiceRequestAccept({
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
-  // ✅ keep form synced when parent data changes
+  //  keep form synced when parent data changes
   useEffect(() => {
     setFormData(initialFormData);
   }, [initialFormData]);
@@ -51,19 +51,19 @@ export default function ServiceRequestAccept({
       });
 
       const data = await response.json();
-      console.log("✅ Email send response:", data);
+      console.log(" Email send response:", data);
 
-      // ✅ detect backend success
+      //  detect backend success
       if (response.ok && data?.success === true) {
         onSend(data); // send to parent to show success component
       } else {
         setStatusMessage(
-          data?.message || "❌ Failed to send email. Please try again."
+          data?.message || " Failed to send email. Please try again."
         );
       }
     } catch (error) {
-      console.error("❌ Error sending email:", error);
-      setStatusMessage("❌ Failed to send email. Please try again.");
+      console.error(" Error sending email:", error);
+      setStatusMessage(" Failed to send email. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -117,7 +117,7 @@ export default function ServiceRequestAccept({
         {/* Error / Info Message */}
         {statusMessage && (
           <div
-            className={`text-sm mt-2 ${statusMessage.startsWith("✅") ? "text-green-600" : "text-red-600"
+            className={`text-sm mt-2 ${statusMessage.startsWith("") ? "text-green-600" : "text-red-600"
               }`}
           >
             {statusMessage}

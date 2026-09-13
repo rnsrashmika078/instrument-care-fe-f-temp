@@ -1,4 +1,11 @@
 import { toast } from "react-toastify";
+import { API_BASE } from "../../config";
+
+export const assetUrl = (path) => {
+  if (!path) return null;
+  if (/^(https?:)?\/\//i.test(path)) return path;
+  return `${API_BASE}/public/${path.replace(/^\/+/, "")}`;
+};
 
 export const fetchWithAuth = async (url, options = {}) => {
   const token = sessionStorage.getItem("token");

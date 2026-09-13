@@ -38,7 +38,7 @@ export default function AllOwnerTable({ usersData }) {
     }
   };
 
-  // ✅ Updated handleSave to call backend API
+  //  Updated handleSave to call backend API
   const handleSave = async () => {
     if (!editingUser || !editingUser.id) return;
 
@@ -68,7 +68,7 @@ export default function AllOwnerTable({ usersData }) {
     }
   };
 
-  // ✅ Updated handleDelete to call backend DELETE endpoint
+  //  Updated handleDelete to call backend DELETE endpoint
   const handleDelete = async (userId) => {
     const confirmed = window.confirm("Are you sure you want to delete this user?");
     if (!confirmed) return;
@@ -225,7 +225,7 @@ export default function AllOwnerTable({ usersData }) {
               <input name="gender" value={editingUser.gender || ""} onChange={handleChange} placeholder="Gender" className="border p-2 rounded" />
               <input name="other_institute_name" value={editingUser.other_institute_name || ""} onChange={handleChange} placeholder="Other Institute" className="border p-2 rounded" />
 
-              {/* ✅ ACTIVE / INACTIVE CHECKBOX */}
+              {/*  ACTIVE / INACTIVE CHECKBOX */}
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import DefaultProfileImage from "../../assets/images/profile-image.jpeg";
-import { fetchWithAuth } from "../utils/api";
+import { fetchWithAuth, assetUrl } from "../utils/api";
 import { API_BASE } from "../../config";
 
 export default function ProfileCard() {
@@ -188,7 +188,7 @@ export default function ProfileCard() {
   }
 
   const profileImageUrl =
-    tech.picture !== null ? `${API_BASE}/${tech.picture}` : DefaultProfileImage;
+    tech.picture !== null ? assetUrl(tech.picture) : DefaultProfileImage;
 
   return (
     <div className="bg-[#ffffff80] rounded-xl shadow-sm p-6 font-poppins flex flex-col gap-6">

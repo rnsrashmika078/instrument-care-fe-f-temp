@@ -4,7 +4,7 @@ import { API_BASE } from "../../config";
 export default function ProfileFormLeft({ formData, handleChange }) {
   const [instruments, setInstruments] = useState([]);
 
-  // ✅ Fetch instrument names from backend on component mount
+  //  Fetch instrument names from backend on component mount
   useEffect(() => {
     const fetchInstruments = async () => {
       try {

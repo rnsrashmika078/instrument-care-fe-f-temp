@@ -48,7 +48,7 @@ export default function WorkExperience() {
             const data = await res.json();
             setOldExperience(data.data || []);
         } catch (err) {
-            console.error("❌ Error fetching work experience:", err);
+            console.error(" Error fetching work experience:", err);
         }
     };
 
@@ -95,15 +95,16 @@ export default function WorkExperience() {
             const result = await res.json();
             console.log("📥 Response:", result);
 
-            if (res.ok) {
+if (res.ok) {
                 toast.success("✅ Work Experience updated successfully!");
+                setExperience([]);
                 fetchTechnicianWorkExperience();
             } else {
-                console.error("❌ API Error:", result);
+                console.error(" API Error:", result);
                 toast.error("Failed to update Work Experience");
             }
         } catch (err) {
-            console.error("❌ Error updating Work Experience:", err);
+            console.error(" Error updating Work Experience:", err);
             toast.error("Error updating Work Experience");
         } finally {
             setLoading(false);

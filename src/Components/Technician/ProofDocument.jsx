@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { API_BASE } from "../../config";
+import { assetUrl } from "../utils/api";
 import { toast } from "react-toastify";
 
 export default function ProofDocument() {
@@ -53,7 +54,7 @@ export default function ProofDocument() {
 
 
             if (data.proof) {
-                setDocumentPreview(`${API_BASE}/${data.proof}`);
+                setDocumentPreview(assetUrl(data.proof));
             }
 
         } catch (err) {
@@ -101,13 +102,13 @@ export default function ProofDocument() {
             }
 
             if (res.ok) {
-                toast.success("✅ Document uploaded successfully!");
+                toast.success(" Document uploaded successfully!");
                 fetchDocument();
             } else {
                 toast.error(result.error || result.message || "Upload failed");
             }
         } catch (err) {
-            console.error("❌ Error uploading document:", err);
+            console.error(" Error uploading document:", err);
             toast.error("Error uploading document");
         } finally {
             setLoading(false);
