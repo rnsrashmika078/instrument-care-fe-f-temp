@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./Components/Common/Navbar";
@@ -52,9 +52,11 @@ if (!window.__instrumentcare_toast_alert_patched) {
   window.__instrumentcare_toast_alert_patched = true;
 }
 
+const routerBase = import.meta.env.BASE_URL.replace(/\/$/, "") || "/";
+
 export default function App() {
   return (
-    <Router>
+    <Router basename={routerBase}>
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -255,6 +257,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
