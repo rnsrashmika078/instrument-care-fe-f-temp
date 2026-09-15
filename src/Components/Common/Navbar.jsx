@@ -3,6 +3,7 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import NationalLogo from "../../assets/images/national-logo.jpg";
 import NsfLogo from "../../assets/images/NSF-Logo.jpg";
+import { doFullLogout } from "../auth/Logout";
 import { HOME_BASE } from "../../config";
 
 const loginBtnClass =
@@ -66,14 +67,12 @@ export default function Navbar() {
   })();
 
   const handleLogout = () => {
-    ["isLoggedIn", "role", "user_id", "technician_id", "token"].forEach((key) =>
-      sessionStorage.removeItem(key),
-    );
+    // Logs out of both inst-care AND the instrument (CodeIgniter) session.
+    doFullLogout();
     setIsLoggedIn(false);
     setDropdownOpen(false);
     setMenuOpen(false);
-    window.location.href = HOME_BASE;
-    // this is latest
+    // window.location.href = HOME_BASE is handled inside doFullLogout
   };
 
   const renderLinks = (mobile = false) =>

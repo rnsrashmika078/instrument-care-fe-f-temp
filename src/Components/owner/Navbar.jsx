@@ -5,18 +5,14 @@ import NationalLogo from "../../assets/images/national-logo.jpg";
 import NsfLogo from "../../assets/images/NSF-Logo.jpg";
 import profileImage from "../../assets/images/owner_profile.jpg";
 import { useNavigate } from "react-router-dom";
-import { doFrontendLogout /* or logoutWithBackend */ } from "../auth/Logout";
-import { HOME_BASE } from "../../config";
+import { doFullLogout } from "../auth/Logout";
 
 export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    // EITHER: await logoutWithBackend();   // if you have an API
-    doFrontendLogout(); // frontend-only
-
-    // use replace so the Back button won't jump into a protected page
-    window.location.href = HOME_BASE;
+    // Logs out of both inst-care AND the instrument (CodeIgniter) session.
+    doFullLogout();
   };
 
   const [menuOpen, setMenuOpen] = useState(false);

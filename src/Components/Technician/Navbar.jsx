@@ -1,13 +1,11 @@
 import React from "react";
 import NationalLogo from "../../assets/images/national-logo.jpg";
 import NsfLogo from "../../assets/images/NSF-Logo.jpg";
-import { HOME_BASE } from "../../config";
-import { doFrontendLogout } from "../auth/Logout";
+import { doFullLogout } from "../auth/Logout";
 
 export default function Navbar() {
   const handleLogout = () => {
-    doFrontendLogout();
-    window.location.href = HOME_BASE;
+    doFullLogout();
   };
 
   return (

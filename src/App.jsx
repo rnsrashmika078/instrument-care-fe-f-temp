@@ -41,6 +41,8 @@ import View_Statistics from "./Pages/admin/View_Statistics";
 
 // 🔹 import ProtectedRoute
 import ProtectedRoute from "./Components/auth/ProtectedRoute";
+// 🔹 import SsoHandler
+import SsoHandler from "./Components/auth/SsoHandler";
 
 if (!window.__instrumentcare_toast_alert_patched) {
   window.alert = (message) => {
@@ -81,6 +83,7 @@ export default function App() {
         {/* <Route path="/contact" element={<Contact />} /> */}
 
         {/* ===== Auth Routes ===== */}
+        <Route path="/sso" element={<SsoHandler />} />
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/user-registration" element={<UserRegistration />} />
         <Route
