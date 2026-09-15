@@ -7,19 +7,19 @@ import { HOME_BASE } from "../../config";
 
 const loginBtnClass =
   "inline-flex items-center justify-center uppercase whitespace-nowrap " +
-  "text-[12px] font-semibold tracking-[0.5px] w-[150px] h-[36px] px-[16px] " +
+  "text-[13px] font-semibold tracking-[0.5px] w-[170px] h-[43px] px-[18px] " +
   "rounded-lg border border-[#EE9310] bg-[#FFF7EC] text-[#C96F00] " +
   "hover:bg-[#EE9310] hover:text-white transition-all duration-300";
 
 const techRegisterBtnClass =
   "inline-flex items-center justify-center uppercase whitespace-nowrap " +
-  "text-[12px] font-semibold tracking-[0.4px] w-[170px] h-[36px] px-[16px] " +
+  "text-[12.5px] font-semibold tracking-[0.4px] w-[185px] h-[43px] px-[18px] " +
   "rounded-lg border border-[#EE9310] bg-[#FFF7EC] text-[#C96F00] " +
   "hover:bg-[#EE9310] hover:text-white transition-all duration-300";
 
 const dashboardBtnClass =
   "inline-flex items-center justify-center uppercase whitespace-nowrap " +
-  "text-[12px] font-semibold tracking-[0.5px] w-[110px] h-[36px] px-[16px] " +
+  "text-[13px] font-semibold tracking-[0.5px] w-[125px] h-[43px] px-[18px] " +
   "rounded-lg border-none bg-[#EE9310] text-white " +
   "hover:bg-[#d88106] transition-all duration-300";
 
@@ -83,7 +83,7 @@ export default function Navbar() {
         (link.to === "/" ? pathname === "/" : pathname.startsWith(link.to));
       const base =
         "rounded-md transition-colors duration-200 hover:text-[#ea580c] " +
-        (mobile ? "text-center py-2.5 text-[14px] w-full " : "text-[14.5px] ");
+        (mobile ? "text-center py-3 text-[16px] w-full " : "text-[17px] ");
       const linkClass =
         base +
         (active
@@ -125,7 +125,7 @@ export default function Navbar() {
       href={`${CI_BASE}/homedashboard`}
       className={dashboardBtnClass}
       role="button"
-      style={{ fontSize: 12.5 }}
+      style={{ fontSize: 16 }}
     >
       Explore
     </a>
@@ -148,7 +148,7 @@ export default function Navbar() {
             aria-expanded={dropdownOpen}
             className={
               "inline-flex items-center justify-between gap-2 " +
-              "min-w-[120px] px-3.5 py-[7px] text-[13px] " +
+              "min-w-[150px] px-4 py-2.5 text-[15px] " +
               "rounded-lg border border-[#EE9310] bg-[#FFF7EC] text-[#C96F00] " +
               "hover:bg-[#EE9310] hover:text-white transition-all duration-300 " +
               "cursor-pointer"
@@ -240,7 +240,7 @@ export default function Navbar() {
 
         {/* Desktop: center links + actions */}
         <div className="hidden lg:flex flex-1 items-center justify-between ml-8">
-          <div className="flex items-center gap-4 mx-auto">{renderLinks()}</div>
+          <div className="flex items-center gap-7 mx-auto">{renderLinks()}</div>
           <div className="flex items-center gap-2">{renderActions()}</div>
         </div>
       </div>
@@ -264,7 +264,7 @@ export default function Navbar() {
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     aria-haspopup="true"
                     aria-expanded={dropdownOpen}
-                    className="w-full inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg border border-[#EE9310] bg-[#FFF7EC] text-[#C96F00] font-semibold cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 h-12 px-4 rounded-lg border border-[#EE9310] bg-[#FFF7EC] text-[#C96F00] font-semibold cursor-pointer"
                   >
                     My Account
                     <ChevronDown size={16} />
