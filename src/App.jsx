@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./Components/Common/Navbar";
@@ -70,10 +75,10 @@ export default function App() {
       />
       <Routes>
         {/* ===== Common Routes ===== */}
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/technician" element={<Technician />} />
-        <Route path="/contact" element={<Contact />} />
+        {/* <Route path="/" element={<Home />} /> */}
+        {/* <Route path="/about" element={<About />} /> */}
+        {/* <Route path="/technician" element={<Technician />} /> */}
+        {/* <Route path="/contact" element={<Contact />} /> */}
 
         {/* ===== Auth Routes ===== */}
         <Route path="/auth/login" element={<Login />} />

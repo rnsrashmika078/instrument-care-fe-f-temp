@@ -47,7 +47,7 @@ export default function Navbar() {
   }, [pathname]);
 
   const navLinks = [
-    { label: "Home", to: "/" },
+    { label: "Home", to: `${CI_BASE}/home` },
     {
       label: "Product Category",
       to: `${CI_BASE}/eproductView`,
