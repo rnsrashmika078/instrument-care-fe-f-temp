@@ -4,9 +4,9 @@ import { toast } from "react-toastify";
 import { API_BASE } from "../../config";
 
 const steps = [
-  { label: "Instruments" },
-  { label: "Instrument Categories" },
   { label: "Laboratory Categories" },
+  { label: "Instrument Categories" },
+  { label: "Instruments" },
 ];
 
 export default function TechnicalExpertise() {
@@ -189,7 +189,14 @@ export default function TechnicalExpertise() {
         label: item.name,
       }));
 
-      setOptions(ensureOther(formattedOptions));
+      const seen = new Set();
+      const uniqueOptions = formattedOptions.filter((opt) => {
+        if (seen.has(opt.value)) return false;
+        seen.add(opt.value);
+        return true;
+      });
+
+      setOptions(ensureOther(uniqueOptions));
     } catch (error) {
       console.error(error);
     }
@@ -215,7 +222,14 @@ export default function TechnicalExpertise() {
         label: item.name,
       }));
 
-      setInstrCatOptions(ensureOther(formattedOptions));
+      const seen = new Set();
+      const uniqueOptions = formattedOptions.filter((opt) => {
+        if (seen.has(opt.value)) return false;
+        seen.add(opt.value);
+        return true;
+      });
+
+      setInstrCatOptions(ensureOther(uniqueOptions));
     } catch (error) {
       console.error(error);
     }
@@ -242,7 +256,14 @@ export default function TechnicalExpertise() {
         custom_category: item.custom_category,
       }));
 
-      setInstrumentOptions(ensureOther(formattedOptions));
+      const seen = new Set();
+      const uniqueOptions = formattedOptions.filter((opt) => {
+        if (seen.has(opt.value)) return false;
+        seen.add(opt.value);
+        return true;
+      });
+
+      setInstrumentOptions(ensureOther(uniqueOptions));
     } catch (error) {
       console.error(error);
     }
@@ -513,24 +534,20 @@ export default function TechnicalExpertise() {
 
   const stepValid = () => {
     switch (step) {
-      case 0: // Instruments
-        // Check if at least one instrument is selected
-        const hasInstrument = selectedInstruments.some((inst) => {
-          if (!inst) return false;
-          // If it's "Other", check if custom value is filled
-          if (isOtherOption(inst)) {
-            const index = selectedInstruments.indexOf(inst);
-            return (customInstrumentValues[index] || "").trim() !== "";
+      case 0: // Laboratory Categories
+        const hasLabCategory = selectedCategories.some((cat) => {
+          if (!cat) return false;
+          if (isOtherOption(cat)) {
+            const index = selectedCategories.indexOf(cat);
+            return (customLabCatValues[index] || "").trim() !== "";
           }
           return true;
         });
-        return hasInstrument;
+        return hasLabCategory;
 
       case 1: // Instrument Categories
-        // Check if at least one instrument category is selected
         const hasInstCategory = selectedInstrumentCategories.some((cat) => {
           if (!cat) return false;
-          // If it's "Other", check if custom value is filled
           if (isOtherOption(cat)) {
             const index = selectedInstrumentCategories.indexOf(cat);
             return (customInstrCatValues[index] || "").trim() !== "";
@@ -539,18 +556,16 @@ export default function TechnicalExpertise() {
         });
         return hasInstCategory;
 
-      case 2: // Laboratory Categories
-        // Check if at least one category is selected
-        const hasLabCategory = selectedCategories.some((cat) => {
-          if (!cat) return false;
-          // If it's "Other", check if custom value is filled
-          if (isOtherOption(cat)) {
-            const index = selectedCategories.indexOf(cat);
-            return (customLabCatValues[index] || "").trim() !== "";
+      case 2: // Instruments
+        const hasInstrument = selectedInstruments.some((inst) => {
+          if (!inst) return false;
+          if (isOtherOption(inst)) {
+            const index = selectedInstruments.indexOf(inst);
+            return (customInstrumentValues[index] || "").trim() !== "";
           }
           return true;
         });
-        return hasLabCategory;
+        return hasInstrument;
 
       default:
         return true;
@@ -632,7 +647,7 @@ export default function TechnicalExpertise() {
         Laboratory Categories
       </h3>
 
-      {renderSavedLabCategories()}
+      {!isEditing && renderSavedLabCategories()}
 
       {showDropdowns.map((show, i) => (
         <div key={i} className="mt-3 w-full max-w-xs sm:max-w-sm">
@@ -710,7 +725,7 @@ export default function TechnicalExpertise() {
         Instrument Categories
       </h3>
 
-      {renderSavedInstrumentCategories()}
+      {!isEditing && renderSavedInstrumentCategories()}
 
       {showDropdownInstCat.map((show, i) => (
         <div key={i} className="mt-3 w-full max-w-xs sm:max-w-sm">
@@ -788,7 +803,7 @@ export default function TechnicalExpertise() {
     <div>
       <h3 className="font-medium text-gray-700 mb-3">Instruments</h3>
 
-      {renderSavedInstruments()}
+      {!isEditing && renderSavedInstruments()}
 
       {showDropdownInstruments.map((show, i) => (
         <div key={i} className="mt-3 w-full max-w-xs sm:max-w-sm">
@@ -937,18 +952,18 @@ export default function TechnicalExpertise() {
   const stepContent = () => {
     switch (step) {
       case 0:
+        return renderLabCategories();
+
+      case 1:
+        return renderInstrumentCategories();
+
+      case 2:
         return (
           <div className="space-y-8">
             {renderInstruments()}
             {/* {renderNewInstruments()} */}
           </div>
         );
-
-      case 1:
-        return renderInstrumentCategories();
-
-      case 2:
-        return renderLabCategories();
 
       default:
         return null;
@@ -987,7 +1002,7 @@ export default function TechnicalExpertise() {
                 d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
               />
             </svg>
-            Edit
+            Add
           </button>
         ) : (
           <button
@@ -1001,28 +1016,82 @@ export default function TechnicalExpertise() {
       </div>
 
       {!isEditing ? (
-        <div className="space-y-8">
-          <div>
-            <h3 className="font-medium text-gray-700 mb-3">
-              Laboratory Categories
-            </h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="bg-orange-50 border-b-2 border-orange-200">
+                <th className="text-left px-4 py-3 font-semibold text-gray-700">
+                  Laboratory Category
+                </th>
+                <th className="text-left px-4 py-3 font-semibold text-gray-700">
+                  Instrument Category
+                </th>
+                <th className="text-left px-4 py-3 font-semibold text-gray-700">
+                  Instrument
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {(() => {
+                const maxRows = Math.max(
+                  labCategories.length || 0,
+                  instrumentCategories.length || 0,
+                  instruments.length || 0,
+                );
 
-            {renderSavedLabCategories()}
-          </div>
+                if (maxRows === 0) {
+                  return (
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="px-4 py-6 text-center text-gray-400 text-sm"
+                      >
+                        No technical expertise added yet.
+                      </td>
+                    </tr>
+                  );
+                }
 
-          <div>
-            <h3 className="font-medium text-gray-700 mb-3">
-              Instrument Categories
-            </h3>
-
-            {renderSavedInstrumentCategories()}
-          </div>
-
-          <div>
-            <h3 className="font-medium text-gray-700 mb-3">Instruments</h3>
-
-            {renderSavedInstruments()}
-          </div>
+                return Array.from({ length: maxRows }, (_, i) => (
+                  <tr
+                    key={i}
+                    className="border-b border-gray-200 hover:bg-gray-50 transition"
+                  >
+                    <td className="px-4 py-3">
+                      {labCategories[i] ? (
+                        <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold whitespace-nowrap">
+                          {labCategories[i].name ||
+                            labCategories[i].custom_category}
+                        </span>
+                      ) : (
+                        <span className="text-gray-300 text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {instrumentCategories[i] ? (
+                        <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold whitespace-nowrap">
+                          {instrumentCategories[i].name ||
+                            instrumentCategories[i].custom_category}
+                        </span>
+                      ) : (
+                        <span className="text-gray-300 text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {instruments[i] ? (
+                        <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold whitespace-nowrap">
+                          {instruments[i].instrument_name ||
+                            instruments[i].custom_category}
+                        </span>
+                      ) : (
+                        <span className="text-gray-300 text-xs">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ));
+              })()}
+            </tbody>
+          </table>
         </div>
       ) : (
         <>

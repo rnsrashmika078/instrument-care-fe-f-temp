@@ -96,16 +96,16 @@ export default function WorkExperience() {
             console.log("📥 Response:", result);
 
 if (res.ok) {
-                toast.success("✅ Work Experience updated successfully!");
+                toast.success("✅ Current/Past Employment updated successfully!");
                 setExperience([]);
                 fetchTechnicianWorkExperience();
             } else {
                 console.error(" API Error:", result);
-                toast.error("Failed to update Work Experience");
+                toast.error("Failed to update Current/Past Employment");
             }
         } catch (err) {
-            console.error(" Error updating Work Experience:", err);
-            toast.error("Error updating Work Experience");
+            console.error(" Error updating Current/Past Employment:", err);
+            toast.error("Error updating Current/Past Employment");
         } finally {
             setLoading(false);
         }
@@ -113,7 +113,7 @@ if (res.ok) {
 
     // return (
     //     <div className="bg-[#ffffff80] shadow rounded-xl p-6 space-y-4">
-    //         <h3 className="font-semibold text-lg">Work Experience</h3>
+    //         <h3 className="font-semibold text-lg">Current/Past Employment</h3>
 
     //         <h3 className="font-medium mb-3">Previous Experience</h3>
 
@@ -218,7 +218,7 @@ if (res.ok) {
     //                 disabled={loading}
     //                 className="bg-orange-600 text-white px-5 py-2 rounded-lg hover:bg-orange-500"
     //             >
-    //                 {loading ? "Updating..." : "Update Work Experience"}
+    //                 {loading ? "Updating..." : "Update Current/Past Employment"}
     //             </button>
     //         </div>
     //     </div>
@@ -226,8 +226,7 @@ if (res.ok) {
 
     return (
         <div className="bg-[#ffffff80] shadow rounded-xl p-6 space-y-4">
-            <h3 className="font-semibold text-lg">Work Experience</h3>
-            <h3 className="font-medium mb-3">Previous Experience</h3>
+            <h3 className="font-semibold text-lg">Current/Past Employment</h3>
 
             <div className="space-y-3">
             {oldExperience.map((exp, i) => (
@@ -304,7 +303,7 @@ if (res.ok) {
                 disabled={loading}
                 className="bg-orange-600 text-white px-5 py-2 rounded-lg hover:bg-orange-500 w-full sm:w-auto"
             >
-                {loading ? "Updating..." : "Update Work Experience"}
+                {loading ? "Updating..." : "Update Current/Past Employment"}
             </button>
             </div>
         </div>

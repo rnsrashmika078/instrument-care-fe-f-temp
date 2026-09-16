@@ -167,8 +167,10 @@ export default function ProofDocument() {
                 View Uploaded Document
             </a>
             ) : (
+            <p className="text-gray-400">No document uploaded</p>
+            )}
+
             <div className="space-y-2">
-                <p className="text-gray-400">No document uploaded</p>
                 <label className="cursor-pointer inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-3 py-2 rounded-md text-sm hover:bg-orange-200">
                 Choose File
                 <input
@@ -178,8 +180,10 @@ export default function ProofDocument() {
                     className="hidden"
                 />
                 </label>
+                {documentFile && (
+                <p className="text-sm text-gray-600">{documentFile.name} selected</p>
+                )}
             </div>
-            )}
 
             <div className="flex justify-end">
             <button

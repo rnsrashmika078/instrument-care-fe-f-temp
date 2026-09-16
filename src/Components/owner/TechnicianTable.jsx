@@ -9,7 +9,7 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
   const navigate = useNavigate();
   const [technicians, setTechnicians] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 15;
+  const recordsPerPage = 10;
 
   useEffect(() => {
     setCurrentPage(1);
@@ -63,6 +63,22 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
   );
   const totalPages = Math.ceil(filteredTechnicians.length / recordsPerPage);
 
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (end < totalPages - 1) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
   const handleViewProfile = async (tech_user_id, tech_id) => {
     console.log("tech_id", tech_id);
 
@@ -96,7 +112,7 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
     <section className="bg-white py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-800">
                 All Technicians
@@ -109,7 +125,7 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
               </div>
             </div>
 
-            <div className="w-full max-w-xl rounded-2xl   p-2.5 md:p-3">
+            <div className="w-full rounded-2xl p-2.5 md:p-3">
               <div className="flex flex-col gap-2 sm:flex-row">
                 <input
                   type="text"
@@ -119,7 +135,7 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
                     setCurrentPage(1);
                   }}
                   placeholder="Search by technician name, instrument, or specialty"
-                  className="h-12 flex-1 rounded-xl border  bg-white px-4 text-sm text-gray-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                  className="h-12 flex-1 rounded-xl border bg-white px-4 text-sm text-gray-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                 />
                 <button
                   type="button"
@@ -273,7 +289,7 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
+        {filteredTechnicians.length > 0 && (
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-6 pt-4 border-t border-gray-200">
             <span className="text-sm text-gray-600">
               Showing {indexOfFirstRecord + 1} to{" "}
@@ -288,9 +304,30 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
               >
                 Previous
               </button>
-              <span className="text-sm font-medium text-gray-700 mx-2">
-                Page {currentPage} of {totalPages}
-              </span>
+
+              {getPageNumbers().map((page, idx) =>
+                page === "..." ? (
+                  <span
+                    key={`ellipsis-${idx}`}
+                    className="px-1 text-gray-400 text-sm"
+                  >
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1.5 rounded-md text-sm border transition ${
+                      currentPage === page
+                        ? "bg-orange-500 border-orange-500 text-white font-semibold"
+                        : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+
               <button
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
