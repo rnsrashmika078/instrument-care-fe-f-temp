@@ -54,7 +54,7 @@ export default function Navbar() {
             {/* Go Back to Instrument */}
             <a
               href={`${HOME_BASE}/home`}
-              className="border border-orange-300 text-orange-700 px-4 py-2 rounded-md font-medium hover:bg-orange-100 transition font-poppins"
+              className="border border-orange-300 text-orange-700 px-4 py-2 rounded-md font-medium hover:bg-orange-300 hover:text-black transition font-poppins"
             >
               Go Back
             </a>
@@ -112,7 +112,7 @@ export default function Navbar() {
             {/* Go Back to Instrument — mobile */}
             <a
               href={`${HOME_BASE}/home`}
-              className="w-full block text-center border border-orange-300 text-orange-700 px-4 py-2 rounded-md font-medium hover:bg-orange-100 transition font-poppins"
+              className="w-full block text-center border border-orange-300 text-orange-700 px-4 py-2 rounded-md font-medium hover:bg-orange-300 hover:text-black transition font-poppins"
             >
               Go Back
             </a>

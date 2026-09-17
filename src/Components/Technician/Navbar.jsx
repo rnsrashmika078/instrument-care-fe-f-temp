@@ -32,7 +32,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2 shrink-0">
             <a
               href={`${HOME_BASE}/home`}
-              className="bg-orange-50 border border-orange-300 text-orange-700 px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-md font-medium hover:bg-orange-100 transition"
+              className="bg-orange-50 border border-orange-300 text-orange-700 px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-md font-medium hover:bg-orange-300 hover:text-black transition"
             >
               Go Back
             </a>
