@@ -1,10 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import profileImage from "../../assets/images/profile-image.jpeg";
 import { fetchWithAuth, assetUrl } from "../utils/api";
 import { API_BASE } from "../../config";
 
+const navItems = [
+  { to: "/tech/dashboard", label: "Dashboard" },
+  { to: "/tech/service-request", label: "Service Request" },
+  { to: "/tech/profile", label: "My Profile" },
+];
+
+const activeBtnClass =
+  "bg-orange-500 text-white font-semibold px-4 py-2.5 rounded-xl w-48 transition-colors duration-200 hover:bg-orange-600";
+const inactiveBtnClass =
+  "bg-orange-50 border border-orange-200 text-orange-700 font-semibold px-4 py-2.5 rounded-xl w-48 transition-colors duration-200 hover:bg-orange-100";
+
 export default function Sidebar() {
+  const { pathname } = useLocation();
   const [fullName, setFullName] = useState("Untitled Technician");
   const [designation, setDesignation] = useState("Technician");
   const [image, setImage] = useState(null);
@@ -37,6 +49,11 @@ export default function Sidebar() {
     loadProfile();
   }, []);
 
+  const isActive = (to) =>
+    to === "/tech/dashboard"
+      ? pathname === to
+      : pathname.startsWith(to);
+
   const SidebarContent = () => (
     <div className="flex flex-col justify-between h-full p-4 font-poppins bg-white border-r border-orange-200">
       <div className="flex flex-col items-center">
@@ -61,21 +78,22 @@ export default function Sidebar() {
         <hr className="w-full border-orange-200 my-4" />
 
         <nav className="flex flex-col items-center space-y-3 w-full">
-          <Link to="/tech/dashboard" onClick={() => setIsOpen(false)}>
-            <button className="bg-orange-500 text-white font-semibold px-4 py-2.5 rounded-xl w-48 transition-colors duration-200 hover:bg-orange-600">
-              Dashboard
-            </button>
-          </Link>
-          <Link to="/tech/service-request" onClick={() => setIsOpen(false)}>
-            <button className="bg-orange-50 border border-orange-200 text-orange-700 font-semibold px-4 py-2.5 rounded-xl w-48 transition-colors duration-200 hover:bg-orange-100">
-              Service Request
-            </button>
-          </Link>
-          <Link to="/tech/profile" onClick={() => setIsOpen(false)}>
-            <button className="bg-orange-50 border border-orange-200 text-orange-700 font-semibold px-4 py-2.5 rounded-xl w-48 transition-colors duration-200 hover:bg-orange-100">
-              My Profile
-            </button>
-          </Link>
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={() => setIsOpen(false)}
+              aria-current={isActive(item.to) ? "page" : undefined}
+            >
+              <button
+                className={
+                  isActive(item.to) ? activeBtnClass : inactiveBtnClass
+                }
+              >
+                {item.label}
+              </button>
+            </Link>
+          ))}
         </nav>
       </div>
 
@@ -120,8 +138,8 @@ export default function Sidebar() {
         <SidebarContent />
       </div>
 
-      {/* ── Desktop sidebar (always visible) ── */}
-      <aside className="hidden md:flex bg-white border border-orange-200 text-black rounded-2xl w-64 flex-shrink-0 flex-col justify-between font-poppins overflow-hidden">
+      {/* ── Desktop sidebar (always visible, sticky so it doesn't scroll) ── */}
+      <aside className="hidden md:flex bg-white border border-orange-200 text-black rounded-2xl w-64 flex-shrink-0 flex-col justify-between font-poppins overflow-hidden self-start sticky top-[76px] max-h-[calc(100vh-84px)]">
         <SidebarContent />
       </aside>
     </>
