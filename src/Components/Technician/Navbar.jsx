@@ -2,6 +2,7 @@ import React from "react";
 import NationalLogo from "../../assets/images/national-logo.jpg";
 import NsfLogo from "../../assets/images/NSF-Logo.jpg";
 import { doFullLogout } from "../auth/Logout";
+import { HOME_BASE } from "../../config";
 
 export default function Navbar() {
   const handleLogout = () => {
@@ -27,8 +28,14 @@ export default function Navbar() {
             Instrument Care
           </h1>
 
-          {/* RIGHT: Logout */}
-          <div className="shrink-0">
+          {/* RIGHT: Go Back + Logout */}
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href={`${HOME_BASE}/home`}
+              className="bg-orange-50 border border-orange-300 text-orange-700 px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-md font-medium hover:bg-orange-100 transition"
+            >
+              Go Back
+            </a>
             <button
               onClick={handleLogout}
               className="bg-orange-500 text-white px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-md font-medium hover:bg-orange-600 transition"
@@ -36,8 +43,6 @@ export default function Navbar() {
               Logout
             </button>
           </div>
-
-          {/* LEFT: Hamburger (mobile only) */}
         </div>
       </div>
     </nav>
