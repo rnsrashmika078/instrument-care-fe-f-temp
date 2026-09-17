@@ -6,6 +6,7 @@ import NsfLogo from "../../assets/images/NSF-Logo.jpg";
 import profileImage from "../../assets/images/owner_profile.jpg";
 import { useNavigate } from "react-router-dom";
 import { doFullLogout } from "../auth/Logout";
+import { HOME_BASE } from "../../config";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -16,8 +17,6 @@ export default function Navbar() {
   };
 
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const navLinks = ["Home", "About", "Technician", "Contact"];
 
   // Replace with actual user profile image or dynamic user photo
 
@@ -51,6 +50,14 @@ export default function Navbar() {
                 alt="Profile"
                 className="h-10 w-10 rounded-full object-cover cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
               /> */}
+
+            {/* Go Back to Instrument */}
+            <a
+              href={`${HOME_BASE}/home`}
+              className="border border-orange-300 text-orange-700 px-4 py-2 rounded-md font-medium hover:bg-orange-100 transition font-poppins"
+            >
+              Go Back
+            </a>
 
             {/* All Service Requests */}
             <Link to="/user/my-request">
@@ -101,6 +108,14 @@ export default function Navbar() {
                 {link}
               </Link>
             ))} */}
+
+            {/* Go Back to Instrument — mobile */}
+            <a
+              href={`${HOME_BASE}/home`}
+              className="w-full block text-center border border-orange-300 text-orange-700 px-4 py-2 rounded-md font-medium hover:bg-orange-100 transition font-poppins"
+            >
+              Go Back
+            </a>
 
             {/* My Request button — was missing on mobile */}
             <Link to="/user/my-request" onClick={() => setMenuOpen(false)}>
