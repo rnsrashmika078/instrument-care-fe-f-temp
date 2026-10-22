@@ -12,10 +12,13 @@ import { API_BASE } from '../../config';
 
 export default function Admin_Dashboard() {
   const [chartData, setChartData] = useState([]);
+  const [chartLoading, setChartLoading] = useState(true);
   const token = sessionStorage.getItem("token");
 
   // 🔥 Fetch line chart data from backend
   useEffect(() => {
+    let active = true;
+
     const fetchChartData = async () => {
       try {
         const response = await fetchWithAuth(`${API_BASE}/admin/line-chart`,
@@ -29,25 +32,30 @@ export default function Admin_Dashboard() {
         const data = await response.json();
 
         //  Set backend response to chartData
-        setChartData(data);
+        if (active) setChartData(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Failed to fetch line chart data:', error);
+      } finally {
+        if (active) setChartLoading(false);
       }
     };
 
     fetchChartData();
+
+    return () => {
+      active = false;
+    };
   }, [token]);
 
   return (
     <>
       <Navbar />
 
-      <div className="min-h-screen bg-[#fffaf5] px-3 py-4 md:px-5 md:py-6">
-        <div className="mx-auto flex max-w-[1600px] flex-col gap-5 lg:flex-row">
+      <div className="flex w-full flex-col gap-4 bg-[#fffaf5] p-2 md:h-full md:flex-row md:p-4">
           <Admin_Sidebar />
 
-          <main className="flex-1 rounded-[1.75rem] border border-orange-100 bg-white p-4 md:p-6">
-            <div className="mb-6 flex flex-col gap-3 border-b border-orange-100 pb-5 md:flex-row md:items-end md:justify-between">
+          <main className="min-w-0 flex-1 rounded-[1.75rem] border border-gray-200 bg-white p-4 pt-14 md:p-6 md:pt-6">
+            <div className="mb-6 flex flex-col gap-3 border-b border-gray-200 pb-5 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-orange-500">
                   Control Center
@@ -56,7 +64,7 @@ export default function Admin_Dashboard() {
                   Admin Dashboard
                 </h2>
               </div>
-              <div className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-600">
+              <div className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-600">
                 System overview
               </div>
             </div>
@@ -64,7 +72,7 @@ export default function Admin_Dashboard() {
             <AdminDashboardStats />
 
             <div className="mt-6 grid gap-5 xl:grid-cols-[1.4fr_1fr]">
-              <AdminDashboardLineChart data={chartData} />
+              <AdminDashboardLineChart data={chartData} loading={chartLoading} />
               <AdminDashboardTechnicianViewStats />
             </div>
 
@@ -72,7 +80,6 @@ export default function Admin_Dashboard() {
               <SearchTrendsChart />
             </div>
           </main>
-        </div>
       </div>
 
       <Footer />

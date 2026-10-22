@@ -32,10 +32,10 @@ const RecentInstruments = () => {
             Recently Added Instruments
           </h2>
           <div className="flex gap-2">
-            <button className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-orange-500 transition-colors">
+            <button className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-gray-500 transition-colors">
               <ChevronLeft className="w-4 h-4 text-gray-900" />
             </button>
-            <button className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-orange-500 transition-colors">
+            <button className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-gray-500 transition-colors">
               <ChevronRight className="w-4 h-4 text-gray-900" />
             </button>
           </div>
@@ -45,7 +45,7 @@ const RecentInstruments = () => {
           {instruments.map((item) => (
             <div
               key={item.name}
-              className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow group cursor-pointer"
+              className="bg-white rounded-lg overflow-hidden border-2 border-gray-200 hover:shadow-lg transition-shadow group cursor-pointer"
             >
               <div className="h-48 overflow-hidden">
                 <img

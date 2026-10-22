@@ -1,5 +1,4 @@
-import { fetchWithAuth } from '../../Components/utils/api';
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Navbar from '../../Components/Technician/Navbar'
 import Admin_Sidebar from '../../Components/admin/Sidebar'
 import SearchTerm from '../../Components/admin/SearchTerm';
@@ -12,11 +11,19 @@ export default function View_Statistics() {
         <>
             <Navbar />
 
-            <div className="flex flex-col md:flex-row h-full w-full p-2 md:p-4 gap-4 bg-orange-100">
+            <div className="flex w-full flex-col gap-4 bg-orange-50 p-2 md:h-full md:flex-row md:p-4">
                 <Admin_Sidebar />
 
-                <main className="flex-1 bg-[#ffffff80] rounded-lg p-4">
-                    <h2 className="text-xl font-bold mb-4">Statistics</h2>
+                <main className="min-w-0 flex-1 space-y-4 pt-14 md:pt-0">
+                    <div className="px-1">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-orange-500">
+                            Insights
+                        </p>
+                        <h2 className="mt-1 text-2xl font-bold tracking-tight text-gray-900">
+                            Statistics
+                        </h2>
+                    </div>
+
                     <SearchTerm />
                     <TechnicianSearchRequests />
                     <TechnicianViewAndActive />

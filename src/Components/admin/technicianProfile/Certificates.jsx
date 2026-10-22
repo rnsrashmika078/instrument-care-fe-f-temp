@@ -144,7 +144,7 @@ export default function Certificates({ userId }) {
     };
 
     return (
-        <div className="bg-[#ffffff80] shadow rounded-xl p-6 space-y-4">
+        <div className="bg-[#ffffff80] shadow rounded-xl p-6 space-y-4 border-2 border-gray-200">
             <h3 className="font-semibold text-lg mb-3">Certificates</h3>
 
             <div className="space-y-3">

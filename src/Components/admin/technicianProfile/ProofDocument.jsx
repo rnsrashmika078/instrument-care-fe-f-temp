@@ -52,7 +52,7 @@ export default function ProofDocument({ userId }) {
             console.log("📄 Document data:", data);
 
             if (data.proof) {
-                setDocumentPreview(`${API_BASE}/public/${data.proof}`);
+                setDocumentPreview(`${API_BASE}/${data.proof}`);
             }
 
         } catch (err) {
@@ -116,7 +116,7 @@ export default function ProofDocument({ userId }) {
     };
 
     return (
-        <div className="bg-[#ffffff80] shadow rounded-xl p-6 space-y-4">
+        <div className="bg-[#ffffff80] shadow rounded-xl p-6 space-y-4 border-2 border-gray-200">
             <h3 className="font-semibold text-lg">Gurantee Of Service</h3>
             {documentPreview ? (
                 <a

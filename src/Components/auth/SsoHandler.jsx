@@ -25,12 +25,26 @@ function getDashboardPath(role) {
   return "/user/dashboard";
 }
 
+// The instrument (CodeIgniter) side can ask for a specific portal page after the
+// handshake - e.g. the public "Hire Technician" button linking straight to
+// /user/view-profile/:id. Only owner routes are honoured, and only with
+// id-ish segments, so a crafted value cannot redirect off the portal.
+function getRequestedPath(rawTarget) {
+  if (!rawTarget) return null;
+
+  const target = `/${String(rawTarget).replace(/^\/+/, "")}`;
+
+  return /^\/user(?:\/[A-Za-z0-9_-]+)*$/.test(target) ? target : null;
+}
+
 export default function SsoHandler() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const token = searchParams.get("token");
+    // Grab the target before the query string is rewritten below.
+    const requestedPath = getRequestedPath(searchParams.get("redirect"));
 
     // Clean the token out of the URL as soon as possible.
     window.history.replaceState({}, document.title, window.location.pathname);
@@ -57,7 +71,7 @@ export default function SsoHandler() {
     }
     sessionStorage.setItem("token", token);
 
-    navigate(getDashboardPath(role), { replace: true });
+    navigate(requestedPath || getDashboardPath(role), { replace: true });
   }, [navigate, searchParams]);
 
   return (

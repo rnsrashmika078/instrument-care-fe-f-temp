@@ -35,7 +35,7 @@ export default function ProfileFormLeft({ formData, handleChange }) {
           name="institute_name"
           value={formData.institute_name}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
       <label className="pl-4">
@@ -45,7 +45,7 @@ export default function ProfileFormLeft({ formData, handleChange }) {
           name="current_designation"
           value={formData.current_designation}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -58,7 +58,7 @@ export default function ProfileFormLeft({ formData, handleChange }) {
           name="supervisor_name"
           value={formData.supervisor_name}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -69,7 +69,7 @@ export default function ProfileFormLeft({ formData, handleChange }) {
           name="supervisor_Designation"
           value={formData.supervisor_Designation}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -80,7 +80,7 @@ export default function ProfileFormLeft({ formData, handleChange }) {
           name="supervisor_Email"
           value={formData.supervisor_Email}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -92,7 +92,7 @@ export default function ProfileFormLeft({ formData, handleChange }) {
           name="laboratory_category"
           value={formData.laboratory_category}
           onChange={handleChange}
-          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         >
           <option value="">Select Laboratory Category</option>
           <option value="1">Chemical Testing</option>
@@ -118,7 +118,7 @@ export default function ProfileFormLeft({ formData, handleChange }) {
           name="instrument_category"
           value={formData.instrument_category}
           onChange={handleChange}
-          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         >
           <option value="">Select Instrument Category</option>
           <option value="1">Analiytical Balance</option>
@@ -160,7 +160,7 @@ export default function ProfileFormLeft({ formData, handleChange }) {
           name="instrument"
           value={formData.instrument}
           onChange={handleChange}
-          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         >
           <option value="">Select Instrument</option>
           {instruments.map((inst, index) => (

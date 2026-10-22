@@ -29,7 +29,7 @@ const CategorySearch = () => {
               key={label}
               className="flex flex-col items-center gap-1.5 group cursor-pointer"
             >
-              <div className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center group-hover:border-orange-500 group-hover:bg-orange-50 transition-colors">
+              <div className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center group-hover:border-gray-500 group-hover:bg-orange-50 transition-colors">
                 <Icon className="w-5 h-5 text-gray-400 group-hover:text-orange-500 transition-colors" />
               </div>
               <span className="text-xs text-gray-500 group-hover:text-gray-900 transition-colors">

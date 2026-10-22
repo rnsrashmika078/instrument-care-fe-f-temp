@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { formatPhone } from "../utils/phone";
 
 export default function ServiceRequestDetails({ details }) {
   const placeholder = !details;
+  const canAct = Boolean(details?.id);
 
   const Field = ({ label, value }) => (
     <div className="flex flex-col">
@@ -14,7 +16,7 @@ export default function ServiceRequestDetails({ details }) {
   );
 
   return (
-    <div className="bg-[#ffffff80] rounded-lg p-5 mt-4 shadow-sm">
+    <div className="bg-[#ffffff80] rounded-lg p-5 mt-4 shadow-sm border-2 border-gray-200">
       <h3 className="font-bold text-lg mb-4">Detailed View</h3>
 
       {/* Owner Details */}
@@ -25,7 +27,7 @@ export default function ServiceRequestDetails({ details }) {
           <Field label="Full Name" value={details?.full_name} />
           <Field label="Email Address" value={details?.email} />
           <Field label="Physical Address" value={details?.institute_address} />
-          <Field label="Contact Number" value={details?.contact_number} />
+          <Field label="Contact Number" value={formatPhone(details?.contact_number)} />
         </div>
       </div>
 
@@ -67,28 +69,54 @@ export default function ServiceRequestDetails({ details }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-center gap-4 sm:justify-end">
-        <Link to="/tech/reject-service-request"
-          state={{
-            request_id: details?.id,
-            email: details?.email
-          }}
-        >
-          <button className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded font-semibold">
-            Reject
-          </button>
-        </Link>
+      {!canAct && (
+        <p className="mb-3 text-right text-xs text-gray-500">
+          Select a service request to accept or reject it.
+        </p>
+      )}
 
-        <Link to="/tech/accept-service-request"
-          state={{
-            request_id: details?.id,
-            email: details?.email
-          }}
-        >
-          <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded font-semibold">
-            Accept
-          </button>
-        </Link>
+      <div className="flex flex-wrap justify-end gap-4">
+        {canAct ? (
+            <>
+              <Link
+                to="/tech/reject-service-request"
+                state={{ request_id: details?.id, email: details?.email }}
+                className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded font-semibold"
+              >
+                Reject
+              </Link>
+
+              <Link
+                to="/tech/accept-service-request"
+                state={{ request_id: details?.id, email: details?.email }}
+                className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded font-semibold"
+              >
+                Accept
+              </Link>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title="Select a service request first"
+                className="bg-gray-200 text-gray-400 px-6 py-2 rounded font-semibold cursor-not-allowed"
+              >
+                Reject
+              </button>
+
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title="Select a service request first"
+                className="bg-gray-200 text-gray-400 px-6 py-2 rounded font-semibold cursor-not-allowed"
+              >
+                Accept
+              </button>
+            </>
+          )}
       </div>
     </div>
   );

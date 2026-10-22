@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../Components/Technician/Navbar';
 import Admin_Sidebar from '../../Components/admin/Sidebar';
 import AdminAllServiceRequest from '../../Components/admin/AdminAllServiceRequest';
+import { TableCard, TableSkeleton } from '../../Components/admin/TableUI';
 import Footer from '../../Components/Common/Footer';
-import BG from '../../assets/images/technician-dashboard-bg-4.jpg';
 import { API_BASE } from '../../config';
 
 export default function All_Service_Requests() {
@@ -57,16 +57,14 @@ export default function All_Service_Requests() {
     <>
       <Navbar />
 
-      <div className="flex flex-col md:flex-row h-full w-full p-2 md:p-4 gap-4 bg-orange-100">
+      <div className="flex w-full flex-col gap-4 bg-orange-50 p-2 md:h-full md:flex-row md:p-4">
         <Admin_Sidebar />
 
-        <main className="flex-1 bg-[#ffffff80] rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-4">All Service Requests</h2>
-
+          <main className="min-w-0 flex-1 pt-14 md:pt-0">
           {loading ? (
-            <p className="text-gray-500 italic p-4 text-center">
-              Loading service requests...
-            </p>
+            <TableCard>
+              <TableSkeleton rows={8} columns={6} />
+            </TableCard>
           ) : (
             <AdminAllServiceRequest requestsData={requestsData} />
           )}

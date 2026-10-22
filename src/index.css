@@ -14,6 +14,29 @@
   --font-poppins: Poppins, "sans-serif";
 }
 
+/* ==========================================================================
+   DEFAULT BORDER COLOUR
+   --------------------------------------------------------------------------
+   Tailwind v4 sets the default `border-color` to `currentColor`, so every
+   `border` / `border-2` in this app that does not also declare a border
+   colour inherits the text colour and renders BLACK. That is why inputs,
+   search bars, table rows and cards were outlined in hard black.
+
+   This restores the soft grey default globally, in one place, so the ~200
+   bare `border` utilities across src/ no longer need individual fixes.
+   Anything that wants a specific colour (border-gray-200, border-gray-500,
+   border-white/20 ...) still wins, because utilities are a later layer.
+   ========================================================================== */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-300);
+  }
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -23,5 +46,198 @@
 }
 
 .input {
-  @apply w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400;
+  @apply w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 bg-white shadow-sm transition-colors duration-150 placeholder:text-gray-400 hover:border-gray-400 focus:outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-400/30;
+}
+
+.field-label {
+  @apply block text-sm font-semibold text-gray-700 mb-1.5 tracking-wide;
+}
+
+/* ==========================================================================
+   PHONE NUMBER FIELDS
+   --------------------------------------------------------------------------
+   A fixed "+94" country-code badge painted inside the left edge of any input
+   that takes a mobile or land number. Add the class on top of the normal
+   field class:  className="input phone-prefix"
+   Users still type the local number (077...); read-only places render the
+   number through formatPhone() so it shows as +94771234567.
+   ========================================================================== */
+.phone-prefix {
+  padding-left: 3.35rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='20' viewBox='0 0 46 20'%3E%3Crect width='46' height='20' rx='4' fill='%23f3f4f6'/%3E%3Ctext x='23' y='14' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='600' fill='%236b7280'%3E+94%3C/text%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 0.5rem center;
+}
+
+.field-section-title {
+  @apply font-semibold text-base text-gray-800 pt-2 pb-1 border-b border-dashed border-gray-200;
+}
+
+.term-checkbox {
+  @apply mt-1 w-5 h-5 shrink-0 appearance-none rounded-sm border-2 border-gray-300 bg-white cursor-pointer transition-colors;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+}
+
+.term-checkbox:checked {
+  @apply bg-orange-500 border-orange-500;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+}
+
+/* Wider toasts with smaller body text, so longer messages fit on fewer lines.
+   Two-class selectors so these win over ReactToastify.css regardless of the
+   order the two stylesheets end up in. Toast width itself is set inline via
+   toastStyle on the ToastContainer in App.jsx. */
+.Toastify__toast .Toastify__toast-body {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  padding: 0.7rem 0.85rem;
+  word-break: break-word;
+}
+
+.Toastify__toast .Toastify__close-button {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+}
+
+/* ==========================================================================
+   TECHNICIAN NAVBAR
+   --------------------------------------------------------------------------
+   Mirrors the AdminLTE shell navbar that user/dashboard renders through
+   application/views/includes/header.php + layout/css/admin.css, so the two
+   dashboards look and line up identically. Every value below is lifted from
+   that stylesheet:
+
+     .main-header          -> bar          (64px, white, --ui-header-shadow)
+     .main-header > .logo  -> __logo       (150px box, hairline, 210x48 image)
+     .navbar-title         -> __title      (24px/700 #2c3e50, centred)
+     .navbar-custom-menu   -> __menu       (right aligned, 8px inset)
+     .tech-module-btn      -> __cta        (orange pill)
+
+   The one deliberate difference is HOW the title is centred. AdminLTE pins it
+   with `position:absolute; left:<logo+toggle>; right:<menu>` and hard-codes
+   both insets, which only stays centred because that menu is a near-fixed
+   170px. This menu grows with the user's name, so the same fixed inset would
+   drift. An equal `1fr auto 1fr` grid gives the same result - title dead
+   centre in the bar - for any menu width, with no magic numbers.
+   ========================================================================== */
+@layer components {
+  .tech-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
+    align-items: stretch;
+    height: 64px;
+    background-color: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    font-family: "Source Sans 3", "Source Sans Pro", "Helvetica Neue", Helvetica,
+      Arial, sans-serif;
+  }
+
+  .tech-nav__logo {
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    padding: 0 10px;
+    border-right: 1px solid #eef1f4;
+  }
+
+  .tech-nav__logo img {
+    max-width: 210px;
+    max-height: 48px;
+    width: auto;
+    height: auto;
+  }
+
+  .tech-nav__title {
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 0 8px;
+    pointer-events: none;
+  }
+
+  .tech-nav__title span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 24px;
+    font-weight: 700;
+    color: #2c3e50;
+    letter-spacing: 0.5px;
+  }
+
+  .tech-nav__menu {
+    justify-self: end;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 8px;
+  }
+
+  /* Plain nav link: grey at rest, dark on hover, like .navbar-nav > li > a. */
+  .tech-nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 43px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #55595c;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .tech-nav__link:hover,
+  .tech-nav__link:focus-visible {
+    background-color: #f4f6f9;
+    color: #2c3e50;
+  }
+
+  /* Matches .tech-module-btn on the CodeIgniter side. */
+  .tech-nav__cta {
+    height: 43px;
+    min-width: 150px;
+    padding: 0 18px;
+    border-radius: 8px;
+    background-color: #fa7901;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: background-color 0.3s ease;
+  }
+
+  .tech-nav__cta:hover,
+  .tech-nav__cta:focus-visible {
+    background-color: #d88106;
+    color: #fff;
+  }
+}
+
+@media (max-width: 1300px) {
+  .tech-nav__title span {
+    font-size: 20px;
+  }
+}
+
+/* AdminLTE hides .navbar-title below this width; the logo and menu carry the
+   bar instead, which also stops the title colliding with a long user name. */
+@media (max-width: 991px) {
+  .tech-nav__title {
+    display: none;
+  }
 }

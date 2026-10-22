@@ -179,7 +179,7 @@ export default function EditProfileForm() {
   };
 
   return (
-    <div className="bg-[#ffffff80] p-4 rounded-lg font-poppins">
+    <div className="bg-[#ffffff80] p-4 rounded-lg font-poppins border-2 border-gray-200">
       <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

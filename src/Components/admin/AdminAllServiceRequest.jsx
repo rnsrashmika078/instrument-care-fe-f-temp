@@ -1,8 +1,33 @@
-import { fetchWithAuth } from '../utils/api';
+import { fetchWithAuth } from "../utils/api";
 import { API_BASE } from "../../config";
 import React, { useState } from "react";
 import { FaEye, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import {
+    DateField,
+    FilterSelect,
+    IconButton,
+    IdTag,
+    RecordsBadge,
+    SearchInput,
+    StatusPill,
+    TableCard,
+    TableEmpty,
+    TableHead,
+    TableScroll,
+    TableToolbar,
+    Td,
+    Th,
+    Tr,
+} from "./TableUI";
+
+const STATUS_OPTIONS = [
+    { value: "All", label: "All Statuses" },
+    { value: "Pending", label: "Pending" },
+    { value: "In Progress", label: "In Progress" },
+    { value: "Completed", label: "Completed" },
+    { value: "Cancelled", label: "Cancelled" },
+];
 
 export default function AdminAllServiceRequest({ requestsData }) {
   const token = sessionStorage.getItem("token");
@@ -145,166 +170,128 @@ export default function AdminAllServiceRequest({ requestsData }) {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return "text-orange-600";
-      case "in progress":
-        return "text-blue-600";
-      case "cancelled":
-      case "canceled":
-        return "text-red-600";
-      case "completed":
-        return "text-green-600";
-      default:
-        return "text-gray-600";
-    }
-  };
-
   return (
-    <div className="bg-[#ffffff80] rounded-lg shadow-sm p-4 font-poppins min-h-[720px]">
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
-        <h3 className="font-bold text-lg text-gray-800">
-          All Service Requests
-        </h3>
+    <>
+      <TableCard>
+        <TableHead
+          title="Service Requests"
+          subtitle="Every instrument request raised by clients"
+        />
 
-        <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-          <input
-            type="text"
-            placeholder="Search requests..."
+        <TableToolbar>
+          <SearchInput
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="border border-gray-300 px-3 py-2 rounded outline-none focus:border-blue-500 sm:w-48 text-sm flex-grow sm:flex-grow-0"
+            onChange={setSearchQuery}
+            placeholder="Search requests…"
           />
-
-          <select
+          <FilterSelect
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border border-gray-300 px-3 py-2 rounded outline-none focus:border-blue-500 text-sm bg-white min-w-[130px] flex-grow sm:flex-grow-0"
-          >
-            <option value="All">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
+            onChange={setStatusFilter}
+            options={STATUS_OPTIONS}
+            className="sm:max-w-[10.5rem]"
+          />
+          <DateField label="From" value={fromDate} onChange={setFromDate} />
+          <DateField label="To" value={toDate} onChange={setToDate} />
+          <RecordsBadge
+            count={filteredRequests.length}
+            noun="requests"
+          />
+        </TableToolbar>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">From</span>
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              className="border border-gray-300 px-3 py-2 rounded outline-none focus:border-blue-500 text-sm"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">To</span>
-            <input
-              type="date"
-              value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
-              className="border border-gray-300 px-3 py-2 rounded outline-none focus:border-blue-500 text-sm"
-            />
-          </div>
-
-          <label className="font-semibold text-gray-700 bg-white px-3 py-2 rounded-md border text-sm shadow-sm shrink-0">Records: {filteredRequests.length}</label>
-
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
         {filteredRequests.length === 0 ? (
-          <p className="text-gray-500 italic p-4 text-center">
-            No service requests found.
-          </p>
+          <TableEmpty
+            title="No service requests"
+            message="No requests match the current search, status or date range."
+            hint="Try clearing the filters"
+          />
         ) : (
-          <div className="max-h-[720px] overflow-y-auto">
-            <table className="w-full text-left text-sm border-collapse">
-              <thead>
-                <tr className="border-b bg-gray-100 text-gray-700">
-                  <th className="p-3">Request ID</th>
-                  <th className="p-3">Requester Name</th>
-                  <th className="p-3">Technician Name</th>
-                  <th className="p-3">Instrument Name</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Requested On</th>
-                  <th className="p-3">Action</th>
-                </tr>
-              </thead>
+          <TableScroll>
+            <thead>
+              <tr>
+                <Th>Request</Th>
+                <Th>Requester</Th>
+                <Th>Technician</Th>
+                <Th>Instrument</Th>
+                <Th>Status</Th>
+                <Th>Requested On</Th>
+                <Th align="center">Actions</Th>
+              </tr>
+            </thead>
 
-              <tbody>
-                {filteredRequests.map((req, i) => (
-                  <tr
-                    key={i}
-                    className="border-b hover:bg-orange-50 transition-colors"
-                  >
-                    <td className="p-3">ID/{req.id}</td>
-                    <td className="p-3">{req.requesterName}</td>
-                    <td className="p-3">{req.technicianName}</td>
-                    <td className="p-3">{req.instrument}</td>
-                    <td
-                      className={`p-3 font-semibold ${getStatusColor(
-                        req.status
-                      )}`}
-                    >
-                      {req.status}
-                    </td>
-                    <td className="p-3">{req.requestedOn}</td>
-
-                    <td className="p-3 flex gap-4 text-lg items-center h-full mt-1">
-                      <FaEye
-                        className="text-blue-500 hover:text-blue-700 transition transform hover:scale-110 cursor-pointer"
+            <tbody>
+              {filteredRequests.map((req, i) => (
+                <Tr key={i} onClick={() => handleOpenModal(req)}>
+                  <Td>
+                    <IdTag value={`REQ-${String(req.id).padStart(4, "0")}`} />
+                  </Td>
+                  <Td>{req.requesterName}</Td>
+                  <Td>{req.technicianName}</Td>
+                  <Td>
+                    <span className="text-gray-600">{req.instrument}</span>
+                  </Td>
+                  <Td>
+                    <StatusPill status={req.status} />
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {req.requestedOn}
+                    </span>
+                  </Td>
+                  <Td align="center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <IconButton
+                        tone="blue"
+                        icon={FaEye}
                         title="View / Edit Details"
-                        size={18}
-                        onClick={(e) => { e.stopPropagation(); handleOpenModal(req); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenModal(req);
+                        }}
                       />
-                      <FaTrash
-                        className="text-red-500 hover:text-red-700 transition transform hover:scale-110 cursor-pointer"
+                      <IconButton
+                        tone="red"
+                        icon={FaTrash}
                         title="Delete Request"
-                        size={18}
-                        onClick={(e) => { e.stopPropagation(); handleDelete(req.id); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(req.id);
+                        }}
                       />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </Td>
+                </Tr>
+              ))}
+            </tbody>
+          </TableScroll>
         )}
-      </div>
+      </TableCard>
 
       {selectedRequest && (
-        <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={handleCloseModal}
-        >
-          <div
-            className="bg-white w-full max-w-4xl max-h-[85vh] rounded-lg shadow-xl overflow-hidden flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-6 py-4 bg-gray-100 border-b flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm">
+          <div className="flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-b from-white to-orange-50/40 px-6 py-4">
+              <h2 className="text-xl font-bold tracking-tight text-gray-900">
                 Service Request Details
               </h2>
               <button
                 onClick={handleCloseModal}
-                className="text-gray-500 hover:text-gray-800 transition text-2xl font-light"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
                 title="Close"
+                aria-label="Close"
               >
                 &times;
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto flex-grow grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid flex-grow grid-cols-1 gap-5 overflow-y-auto p-6 md:grid-cols-2">
               {Object.entries(selectedRequest).map(([key, value]) => {
                 const isReadOnly =
                   key === "id" || key === "created_at" || key === "updated_at" ||
                   key === "requesterName" || key === "technicianName" || key === "instrument" || key === "requestedOn";
 
                 return (
-                  <label key={key} className="flex flex-col text-sm">
-                    <span className="mb-1 font-semibold text-gray-600 capitalize tracking-wide">
+                  <label key={key} className="flex flex-col gap-1.5 text-sm">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                       {key.replace(/_/g, " ")}
                     </span>
                     <input
@@ -313,26 +300,27 @@ export default function AdminAllServiceRequest({ requestsData }) {
                       value={value ?? ""}
                       readOnly={isReadOnly}
                       onChange={handleChange}
-                      className={`rounded px-3 py-2 border ${isReadOnly
-                        ? "bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed"
-                        : "bg-white border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                        }`}
+                      className={`rounded-xl border px-3 py-2.5 outline-none transition ${
+                        isReadOnly
+                          ? "cursor-not-allowed border-gray-100 bg-gray-50 text-gray-400"
+                          : "border-gray-200 bg-white text-gray-700 focus:border-gray-400 focus:ring-4 focus:ring-gray-100"
+                      }`}
                     />
                   </label>
                 );
               })}
             </div>
 
-            <div className="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3">
+            <div className="flex justify-end gap-3 border-t border-gray-100 bg-orange-50/30 px-6 py-4">
               <button
-                className="px-5 py-2 rounded bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 transition font-medium"
+                className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
                 onClick={handleCloseModal}
               >
                 Close
               </button>
 
               <button
-                className="px-5 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition font-medium shadow-sm"
+                className="rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600 active:scale-[0.98]"
                 onClick={handleSave}
               >
                 Save Changes
@@ -341,6 +329,6 @@ export default function AdminAllServiceRequest({ requestsData }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

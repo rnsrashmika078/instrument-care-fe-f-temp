@@ -1,6 +1,71 @@
 import React, { useEffect, useState } from "react";
+import { FaEye } from "react-icons/fa";
 import { fetchWithAuth } from "../utils/api";
 import { API_BASE } from "../../config";
+import { dateOnly } from "../utils/format";
+import { formatPhone } from "../utils/phone";
+import {
+  DateField,
+  FilterSelect,
+  IconButton,
+  IdTag,
+  RecordsBadge,
+  SearchInput,
+  StatusPill,
+  TableCard,
+  TableEmpty,
+  TableHead,
+  TableScroll,
+  TableSkeleton,
+  TableToolbar,
+  Td,
+  Th,
+  Tr,
+} from "../admin/TableUI";
+
+const STATUS_OPTIONS = [
+  { value: "All", label: "All Statuses" },
+  { value: "Pending", label: "Pending" },
+  { value: "In Progress", label: "In Progress" },
+  { value: "Completed", label: "Completed" },
+  { value: "Cancelled", label: "Cancelled" },
+];
+
+const DETAIL_GROUPS = [
+  {
+    title: "Instrument",
+    fields: [
+      ["Instrument Name", "instrument_name"],
+      ["Instrument Brand", "instrument_brand"],
+      ["Instrument Model", "instrument_model"],
+      ["Manufacturer", "instrument_manufacturer"],
+      ["Manufactured Year", "manufactured_year"],
+      ["Product Testing Type", "product_testing_type"],
+      ["Testing Parameter", "testing_parameter"],
+      ["Consumption Period", "consumption_period"],
+    ],
+  },
+  {
+    title: "Technician",
+    fields: [
+      ["Technician Name", "technician_name"],
+      ["Technician Email", "technician_email"],
+      ["Technician Contact", "personal_number"],
+      ["Institute Name", "institute_name"],
+    ],
+  },
+];
+
+function DetailItem({ label, children, wide = false }) {
+  return (
+    <div className={wide ? "sm:col-span-2" : ""}>
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+        {label}
+      </p>
+      <div className="mt-1 text-sm text-gray-700">{children ?? "\u2014"}</div>
+    </div>
+  );
+}
 
 export default function MyPreviousRequestHistoryTable() {
   const token = sessionStorage.getItem("token");
@@ -9,30 +74,37 @@ export default function MyPreviousRequestHistoryTable() {
   const [selectedJob, setSelectedJob] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
   const filteredJobs = jobs.filter((job) => {
-    const searchLower = searchTerm.toLowerCase();
-    const idMatch = `SR/${job.id}`.toLowerCase().includes(searchLower);
-    const instrumentMatch = (job.instrument_name || "").toLowerCase().includes(searchLower);
-    const descriptionMatch = (job.issue_description || "").toLowerCase().includes(searchLower);
-    const statusMatch = (job.status || "").toLowerCase().includes(searchLower);
-    const techNameMatch = (job.technician_name || "").toLowerCase().includes(searchLower);
-    const requestDateMatch = (job.created_at || "").toLowerCase().includes(searchLower);
-    const acceptedDateMatch = (job.accepted_at || "").toLowerCase().includes(searchLower);
-    const completedDateMatch = (job.completed_at || "").toLowerCase().includes(searchLower);
+    const query = searchTerm.trim().toLowerCase();
+    const haystack = [
+      `SR/${job.id}`,
+      `SR-${String(job.id).padStart(4, "0")}`,
+      job.instrument_name,
+      job.issue_description,
+      job.technician_name,
+      job.status,
+      job.created_at,
+      job.start_date,
+      job.end_date,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
 
-    const matchesSearch = !searchTerm || idMatch || instrumentMatch || descriptionMatch || statusMatch || techNameMatch || requestDateMatch || acceptedDateMatch || completedDateMatch;
+    const matchesSearch = !query || haystack.includes(query);
+    const matchesStatus = statusFilter === "All" || job.status === statusFilter;
 
-    const jobDate = job.created_at?.split(" ")[0] || "";
+    const jobDate = dateOnly(job.created_at);
     let matchesDate = true;
-    if (fromDate && jobDate < fromDate) matchesDate = false;
-    if (toDate && jobDate > toDate) matchesDate = false;
+    if (fromDate && (!jobDate || jobDate < fromDate)) matchesDate = false;
+    if (toDate && (!jobDate || jobDate > toDate)) matchesDate = false;
 
-    return matchesSearch && matchesDate;
+    return matchesSearch && matchesStatus && matchesDate;
   });
-
 
   useEffect(() => {
     const fetchServiceRequests = async () => {
@@ -41,24 +113,22 @@ export default function MyPreviousRequestHistoryTable() {
         const userId = sessionStorage.getItem("user_id");
         if (!userId) throw new Error("User not logged in");
 
-        const response = await fetchWithAuth(
-          `${API_BASE}/user/my-requests`,
-          {
-            method: "POST", // POST request to send user_id
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify({ user_id: userId }),
-          }
-        );
+        const response = await fetchWithAuth(`${API_BASE}/user/my-requests`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({ user_id: userId }),
+        });
+
+        if (!response) return;
 
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(data.error || "No data found or server error");
         }
-
 
         if (Array.isArray(data)) {
           setJobs(data);
@@ -76,337 +146,175 @@ export default function MyPreviousRequestHistoryTable() {
     };
 
     fetchServiceRequests();
-  }, []);
-
-  // return (
-  //   <div className="bg-[#ffffff80] rounded-lg shadow-sm p-4 font-poppins">
-  //     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-  //       <h3 className="font-bold text-lg">Service Request History</h3>
-  //       <div className="flex flex-col xl:flex-row gap-3 w-full md:w-auto items-start xl:items-center">
-  //         <input
-  //           type="text"
-  //           placeholder="Search by ID, instrument, status..."
-  //           className="border px-3 py-2 rounded-md text-sm w-full md:w-64 focus:outline-none focus:ring-1 focus:ring-orange-400"
-  //           value={searchTerm}
-  //           onChange={(e) => setSearchTerm(e.target.value)}
-  //         />
-  //         <div className="flex items-center gap-2">
-  //           <span className="text-sm font-medium text-gray-600">Request Date</span>
-  //           <input
-  //             type="date"
-  //             className="border px-2 py-1.5 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-orange-400"
-  //             value={fromDate}
-  //             onChange={(e) => setFromDate(e.target.value)}
-  //           />
-  //           <span className="text-sm font-medium text-gray-600">To</span>
-  //           <input
-  //             type="date"
-  //             className="border px-2 py-1.5 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-orange-400"
-  //             value={toDate}
-  //             onChange={(e) => setToDate(e.target.value)}
-  //           />
-  //         </div>
-  //       </div>
-  //     </div>
-
-  //     <div className="mb-2">
-  //       <p className="text-gray-500 italic text-sm">*Please click on the row if available to view more details</p>
-  //     </div>
-
-  //     <div className="overflow-x-auto">
-  //       <div className="max-h-[540px] overflow-y-auto">
-  //         <table className="w-full text-left text-sm border-collapse">
-  //           <thead>
-  //             <tr className="border-b">
-  //               <th className="p-2">Request ID</th>
-  //               <th className="p-2">Instrument Name</th>
-  //               <th className="p-2">Problem Description</th>
-  //               <th className="p-2">Technician Name</th>
-  //               <th className="p-2">Request Date</th>
-  //               <th className="p-2">Accept Date</th>
-  //               <th className="p-2">Completed Date</th>
-  //               <th className="p-2">Status</th>
-  //             </tr>
-  //           </thead>
-  //           <tbody>
-  //             {loading ? (
-  //               <tr>
-  //                 <td colSpan={8} className="text-center text-gray-500 italic p-4">
-  //                   Loading...
-  //                 </td>
-  //               </tr>
-  //             ) : filteredJobs.length === 0 ? (
-  //               <tr>
-  //                 <td colSpan={8} className="text-center text-gray-500 italic p-4">
-  //                   No matching job summaries found.
-  //                 </td>
-  //               </tr>
-  //             ) : (
-  //               filteredJobs.map((job) => (
-  //                 <tr
-  //                   key={job.id}
-  //                   className="border-b hover:bg-gray-100 cursor-pointer"
-  //                   onClick={() => setSelectedJob(job)}
-  //                 >
-  //                   <td className="p-2">SR/{job.id}</td>
-  //                   <td className="p-2">{job.instrument_name}</td>
-  //                   <td className="p-2">{job.issue_description}</td>
-  //                   <td className="p-2">{job.technician_name}</td>
-  //                   <td className="p-2">{job.created_at?.split(" ")[0]}</td>
-  //                   <td className="p-2">{job.start_date?.split(" ")[0]}</td>
-  //                   <td className="p-2">{job.end_date?.split(" ")[0]}</td>
-  //                   <td
-  //                     className={`p-2 font-bold ${job.status === "In Progress"
-  //                       ? "text-blue-500"
-  //                       : job.status === "Cancelled"
-  //                         ? "text-red-500"
-  //                         : job.status === "Pending"
-  //                           ? "text-yellow-500"
-  //                           : job.status === "Completed"
-  //                             ? "text-green-500"
-  //                             : ""
-  //                       }`}
-  //                   >
-  //                     {job.status}
-  //                   </td>
-  //                 </tr>
-  //               ))
-  //             )}
-  //           </tbody>
-  //         </table>
-  //       </div>
-  //     </div>
-
-  //     {/* Popup Modal */}
-  //     {selectedJob && (
-  //       <div className="fixed inset-0 bg-[#00000090] flex items-center justify-center z-50">
-  //         <div className="bg-white p-6 rounded-lg shadow-lg w-[800px] max-h-[80vh] overflow-y-auto">
-  //           <h2 className="text-lg font-bold mb-4">
-  //             Service Request #{selectedJob.id}
-  //           </h2>
-  //           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-  //             <p><strong>Technician Name:</strong> {selectedJob.technician_name}</p>
-  //             <p><strong>Technician Email:</strong> {selectedJob.technician_email}</p>
-  //             <p><strong>Technician Contact:</strong> {selectedJob.personal_number}</p>
-  //             <p><strong>Institute Name:</strong> {selectedJob.institute_name}</p>
-  //             <p><strong>Institute Address:</strong> {selectedJob.institute_address}</p>
-  //             <p><strong>Instrument Name:</strong> {selectedJob.instrument_name}</p>
-  //             <p><strong>Instrument Brand:</strong> {selectedJob.instrument_brand}</p>
-  //             <p><strong>Instrument Model:</strong> {selectedJob.instrument_model}</p>
-  //             <p><strong>Instrument Manufacturer:</strong> {selectedJob.instrument_manufacturer}</p>
-  //             <p><strong>Manufactured Year:</strong> {selectedJob.manufactured_year}</p>
-  //             <p><strong>Product Testing Type:</strong> {selectedJob.product_testing_type}</p>
-  //             <p><strong>Testing Parameter:</strong> {selectedJob.testing_parameter}</p>
-  //             <p><strong>Consumption Period:</strong> {selectedJob.consumption_period}</p>
-  //             <p className="col-span-2"><strong>Problem Description:</strong> {selectedJob.issue_description}</p>
-  //             <p className="col-span-2">
-  //               <strong>Status:</strong>{" "}
-  //               <span
-  //                 className={`font-bold ${selectedJob.status === "In Progress"
-  //                   ? "text-blue-500"
-  //                   : selectedJob.status === "Cancelled"
-  //                     ? "text-red-500"
-  //                     : selectedJob.status === "Pending"
-  //                       ? "text-yellow-500"
-  //                       : selectedJob.status === "Completed"
-  //                         ? "text-green-500"
-  //                         : ""
-  //                   }`}
-  //               >
-  //                 {selectedJob.status}
-  //               </span>
-  //             </p>
-  //           </div>
-  //           <div className="flex justify-end mt-6">
-  //             <button
-  //               onClick={() => setSelectedJob(null)}
-  //               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-  //             >
-  //               Close
-  //             </button>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     )}
-  //   </div>
-  // );
+  }, [token]);
 
   return (
-  <div className="bg-[#ffffff80] rounded-lg shadow-sm p-4 font-poppins">
-
-    {/* Header + Filters */}
-    <div className="flex flex-col gap-3 mb-4">
-      <h3 className="font-bold text-lg">Service Request History</h3>
-      <input
-        type="text"
-        placeholder="Search by ID, instrument, status..."
-        className="border px-3 py-2 rounded-md text-sm w-full focus:outline-none focus:ring-1 focus:ring-orange-400"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <span className="text-sm font-medium text-gray-600">Request Date</span>
-        <input
-          type="date"
-          className="border px-2 py-1.5 rounded-md text-sm w-full sm:w-auto focus:outline-none focus:ring-1 focus:ring-orange-400"
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
+    <>
+      <TableCard>
+        <TableHead
+          title="Service Request History"
+          subtitle="Every instrument service request you have raised"
         />
-        <span className="text-sm font-medium text-gray-600">To</span>
-        <input
-          type="date"
-          className="border px-2 py-1.5 rounded-md text-sm w-full sm:w-auto focus:outline-none focus:ring-1 focus:ring-orange-400"
-          value={toDate}
-          onChange={(e) => setToDate(e.target.value)}
-        />
-      </div>
-    </div>
 
-    <p className="text-gray-500 italic text-sm mb-2">
-      *Please click on the row/card if available to view more details
-    </p>
+        <TableToolbar>
+          <SearchInput
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Search by ID, instrument, status…"
+          />
+          <FilterSelect
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={STATUS_OPTIONS}
+            className="sm:max-w-[10.5rem]"
+          />
+          <DateField label="From" value={fromDate} onChange={setFromDate} />
+          <DateField label="To" value={toDate} onChange={setToDate} />
+          <RecordsBadge count={filteredJobs.length} noun="requests" />
+        </TableToolbar>
 
-    {/* Desktop Table */}
-    <div className="hidden md:block overflow-x-auto">
-      <div className="max-h-[540px] overflow-y-auto">
-        <table className="w-full text-left text-sm border-collapse">
-          <thead>
-            <tr className="border-b">
-              <th className="p-2">Request ID</th>
-              <th className="p-2">Instrument Name</th>
-              <th className="p-2">Problem Description</th>
-              <th className="p-2">Technician Name</th>
-              <th className="p-2">Request Date</th>
-              <th className="p-2">Accept Date</th>
-              <th className="p-2">Completed Date</th>
-              <th className="p-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+        {loading ? (
+          <TableSkeleton rows={8} columns={7} />
+        ) : filteredJobs.length === 0 ? (
+          <TableEmpty
+            title="No service requests"
+            message="No requests match the current search, status or date range."
+            hint="Try clearing the filters"
+          />
+        ) : (
+          <TableScroll>
+            <thead>
               <tr>
-                <td colSpan={8} className="text-center text-gray-500 italic p-4">Loading...</td>
+                <Th>Request</Th>
+                <Th>Instrument</Th>
+                <Th>Problem Description</Th>
+                <Th>Technician</Th>
+                <Th>Status</Th>
+                <Th>Requested On</Th>
+                <Th>Accepted On</Th>
+                <Th>Completed On</Th>
+                <Th align="center">Actions</Th>
               </tr>
-            ) : filteredJobs.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="text-center text-gray-500 italic p-4">No matching job summaries found.</td>
-              </tr>
-            ) : (
-              filteredJobs.map((job) => (
-                <tr
-                  key={job.id}
-                  className="border-b hover:bg-gray-100 cursor-pointer"
-                  onClick={() => setSelectedJob(job)}
-                >
-                  <td className="p-2">SR/{job.id}</td>
-                  <td className="p-2">{job.instrument_name}</td>
-                  <td className="p-2">{job.issue_description}</td>
-                  <td className="p-2">{job.technician_name}</td>
-                  <td className="p-2">{job.created_at?.split(" ")[0]}</td>
-                  <td className="p-2">{job.start_date?.split(" ")[0]}</td>
-                  <td className="p-2">{job.end_date?.split(" ")[0]}</td>
-                  <td className={`p-2 font-bold ${
-                    job.status === "In Progress" ? "text-blue-500"
-                    : job.status === "Cancelled" ? "text-red-500"
-                    : job.status === "Pending" ? "text-yellow-500"
-                    : job.status === "Completed" ? "text-green-500"
-                    : ""
-                  }`}>
-                    {job.status}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+            </thead>
 
-    {/* Mobile Cards */}
-    <div className="md:hidden space-y-3">
-      {loading ? (
-        <p className="text-center text-gray-500 italic p-4">Loading...</p>
-      ) : filteredJobs.length === 0 ? (
-        <p className="text-center text-gray-500 italic p-4">No matching job summaries found.</p>
-      ) : (
-        filteredJobs.map((job) => (
-          <div
-            key={job.id}
-            className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm space-y-1 cursor-pointer hover:bg-gray-50"
-            onClick={() => setSelectedJob(job)}
-          >
-            <div className="flex justify-between items-center">
-              <p className="font-semibold text-gray-800">SR/{job.id}</p>
-              <span className={`text-xs font-bold ${
-                job.status === "In Progress" ? "text-blue-500"
-                : job.status === "Cancelled" ? "text-red-500"
-                : job.status === "Pending" ? "text-yellow-500"
-                : job.status === "Completed" ? "text-green-500"
-                : ""
-              }`}>
-                {job.status}
-              </span>
-            </div>
-            <p className="text-sm font-medium text-gray-700">{job.instrument_name}</p>
-            <p className="text-xs text-gray-500 line-clamp-2">{job.issue_description}</p>
-            <p className="text-xs text-gray-500">
-              <span className="font-medium text-gray-600">Technician:</span> {job.technician_name || "-"}
-            </p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-xs text-gray-400">
-              <span><span className="font-medium text-gray-500">Requested:</span> {job.created_at?.split(" ")[0]}</span>
-              <span><span className="font-medium text-gray-500">Accepted:</span> {job.start_date?.split(" ")[0] || "-"}</span>
-              <span><span className="font-medium text-gray-500">Completed:</span> {job.end_date?.split(" ")[0] || "-"}</span>
-            </div>
-          </div>
-        ))
-      )}
-    </div>
+            <tbody>
+              {filteredJobs.map((job) => (
+                <Tr key={job.id} onClick={() => setSelectedJob(job)}>
+                  <Td>
+                    <IdTag value={`SR-${String(job.id).padStart(4, "0")}`} />
+                  </Td>
+                  <Td>
+                    <span className="text-gray-600">{job.instrument_name}</span>
+                  </Td>
+                  <Td>
+                    <span className="line-clamp-2" title={job.issue_description}>
+                      {job.issue_description || "\u2014"}
+                    </span>
+                  </Td>
+                  <Td>{job.technician_name || "Unassigned"}</Td>
+                  <Td>
+                    <StatusPill status={job.status} />
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {dateOnly(job.created_at)}
+                    </span>
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {dateOnly(job.start_date)}
+                    </span>
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {dateOnly(job.end_date)}
+                    </span>
+                  </Td>
+                  <Td align="center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <IconButton
+                        tone="blue"
+                        icon={FaEye}
+                        title="View Details"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedJob(job);
+                        }}
+                      />
+                    </div>
+                  </Td>
+                </Tr>
+              ))}
+            </tbody>
+          </TableScroll>
+        )}
+      </TableCard>
 
-    {/* Modal */}
-    {selectedJob && (
-      <div className="fixed inset-0 bg-[#00000090] flex items-center justify-center z-50 p-4">
-        <div className="bg-white p-5 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <h2 className="text-lg font-bold mb-4">Service Request #{selectedJob.id}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-            <p><strong>Technician Name:</strong> {selectedJob.technician_name}</p>
-            <p><strong>Technician Email:</strong> {selectedJob.technician_email}</p>
-            <p><strong>Technician Contact:</strong> {selectedJob.personal_number}</p>
-            <p><strong>Institute Name:</strong> {selectedJob.institute_name}</p>
-            <p><strong>Institute Address:</strong> {selectedJob.institute_address}</p>
-            <p><strong>Instrument Name:</strong> {selectedJob.instrument_name}</p>
-            <p><strong>Instrument Brand:</strong> {selectedJob.instrument_brand}</p>
-            <p><strong>Instrument Model:</strong> {selectedJob.instrument_model}</p>
-            <p><strong>Manufacturer:</strong> {selectedJob.instrument_manufacturer}</p>
-            <p><strong>Manufactured Year:</strong> {selectedJob.manufactured_year}</p>
-            <p><strong>Product Testing Type:</strong> {selectedJob.product_testing_type}</p>
-            <p><strong>Testing Parameter:</strong> {selectedJob.testing_parameter}</p>
-            <p><strong>Consumption Period:</strong> {selectedJob.consumption_period}</p>
-            <p className="sm:col-span-2"><strong>Problem Description:</strong> {selectedJob.issue_description}</p>
-            <p className="sm:col-span-2">
-              <strong>Status:</strong>{" "}
-              <span className={`font-bold ${
-                selectedJob.status === "In Progress" ? "text-blue-500"
-                : selectedJob.status === "Cancelled" ? "text-red-500"
-                : selectedJob.status === "Pending" ? "text-yellow-500"
-                : selectedJob.status === "Completed" ? "text-green-500"
-                : ""
-              }`}>
-                {selectedJob.status}
-              </span>
-            </p>
-          </div>
-          <div className="flex justify-end mt-6">
-            <button
-              onClick={() => setSelectedJob(null)}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full sm:w-auto"
-            >
-              Close
-            </button>
+      {selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm">
+          <div className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-gray-100 bg-gradient-to-b from-white to-orange-50/40 px-6 py-4">
+              <div className="min-w-0">
+                <h2 className="text-xl font-bold tracking-tight text-gray-900">
+                  Service Request Details
+                </h2>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <IdTag prefix="SR-" value={String(selectedJob.id).padStart(4, "0")} />
+                  <StatusPill status={selectedJob.status} />
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedJob(null)}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                title="Close"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="flex-grow space-y-6 overflow-y-auto p-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <DetailItem label="Problem Description" wide>
+                  {selectedJob.issue_description}
+                </DetailItem>
+                <DetailItem label="Request Date">{dateOnly(selectedJob.created_at)}</DetailItem>
+                <DetailItem label="Accept Date">{dateOnly(selectedJob.start_date)}</DetailItem>
+                <DetailItem label="Completed Date">{dateOnly(selectedJob.end_date)}</DetailItem>
+                <DetailItem label="Institute Address" wide>
+                  {selectedJob.institute_address}
+                </DetailItem>
+              </div>
+
+              {DETAIL_GROUPS.map((group) => (
+                <section key={group.title}>
+                  <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-orange-600">
+                    {group.title}
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {group.fields.map(([label, key]) => (
+                      <DetailItem key={key} label={label}>
+                        {key === "personal_number"
+                          ? formatPhone(selectedJob[key])
+                          : selectedJob[key]}
+                      </DetailItem>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-3 border-t border-gray-100 bg-orange-50/30 px-6 py-4">
+              <button
+                className="rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600 active:scale-[0.98]"
+                onClick={() => setSelectedJob(null)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
-
-  </div>
-);
+      )}
+    </>
+  );
 }

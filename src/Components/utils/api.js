@@ -4,7 +4,7 @@ import { API_BASE } from "../../config";
 export const assetUrl = (path) => {
   if (!path) return null;
   if (/^(https?:)?\/\//i.test(path)) return path;
-  return `${API_BASE}/public/${path.replace(/^\/+/, "")}`;
+  return `${API_BASE}/${path.replace(/^\/+/, "")}`;
 };
 
 export const fetchWithAuth = async (url, options = {}) => {
@@ -23,7 +23,7 @@ export const fetchWithAuth = async (url, options = {}) => {
   if (response.status === 401) {
     sessionStorage.clear();
     toast.error("Session expired. Please log in again.");
-    window.location.href = "/auth/login";
+    window.location.href = import.meta.env.BASE_URL + "auth/login";
     return null;
   }
 

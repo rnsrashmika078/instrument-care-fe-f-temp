@@ -30,7 +30,7 @@ export default function ContactSupport() {
 
         <div className="flex flex-col md:flex-row gap-6 justify-center">
           {/* Contact Us Card */}
-          <div className="flex-1 max-w-md bg-white shadow-md rounded-xl p-8 text-center border border-gray-100">
+          <div className="flex-1 max-w-md bg-white shadow-md rounded-xl p-8 text-center border-2 border-gray-200">
             <div className="text-orange-500 text-4xl mb-4">🎧</div>
             <h3 className="text-xl font-semibold mb-2">Contact Us</h3>
             <p className="text-gray-600 text-sm mb-3">
@@ -43,7 +43,7 @@ export default function ContactSupport() {
           </div>
 
           {/* Customer Service Card */}
-          <div className="flex-1 max-w-md bg-white shadow-md rounded-xl p-8 text-center border border-gray-100">
+          <div className="flex-1 max-w-md bg-white shadow-md rounded-xl p-8 text-center border-2 border-gray-200">
             <div className="text-orange-500 text-4xl mb-4">✏️</div>
             <h3 className="text-xl font-semibold mb-2">Customer Service</h3>
             <p className="text-gray-600 text-sm mb-3">

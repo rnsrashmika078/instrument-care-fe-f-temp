@@ -2,7 +2,7 @@ import React from "react";
 
 export default function ServiceRequestRejectFailed({ onBack = () => {} }) {
   return (
-    <div className="rounded-lg p-4 sm:p-6 w-full mx-auto shadow bg-[#ffffff80]">
+    <div className="rounded-lg p-4 sm:p-6 w-full mx-auto shadow bg-[#ffffff80] border-2 border-gray-200">
       {/* Title */}
       <h3 className="font-bold text-lg">Reject Service Request</h3>
 

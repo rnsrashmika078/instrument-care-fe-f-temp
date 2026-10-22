@@ -16,29 +16,26 @@ export default function ServiceRequest() {
     <>
       <Navbar />
 
-      <div className="flex flex-col md:flex-row h-full w-full p-2 md:p-4 gap-4 bg-orange-100">
-        <div className="w-full  bg-[#ffffff70] p-6 font-poppins rounded-md">
-          <h1 className="text-2xl font-bold mb-6">Service Request</h1>
+        <div className="min-h-screen w-full px-3 py-4 md:px-6 md:py-6 bg-gradient-to-br from-orange-50/30 to-amber-50/30">
+        <div className="w-full">
+          <h1 className="text-xl md:text-2xl font-bold mb-4 text-gray-800">Service Request</h1>
 
           <Tabs />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-4">
-            <div className="lg:col-span-1">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 mt-4">
+            <div className="xl:col-span-1">
               <ProfileCard />
             </div>
 
-            <div className="lg:col-span-2 flex flex-col">
+            <div className="xl:col-span-3 flex flex-col gap-4">
               {!showSuccess ? (
                 <ServiceRequestForm onSend={() => setShowSuccess(true)} />
               ) : (
                 <ServiceRequestSuccess onBack={() => setShowSuccess(false)} />
               )}
-
-              {/* <ServiceRequestForm /> */}
             </div>
           </div>
         </div>
-
       </div>
       <Footer />
     </>

@@ -10,20 +10,36 @@ export default function Technician_Dashboard() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col md:flex-row h-full w-full p-2 md:p-4 gap-4 bg-orange-50">
-        <Sidebar />
 
-        {/* pt-14 on mobile gives clearance for the floating hamburger button */}
-        <main className="flex-1 bg-white border border-orange-200 rounded-2xl p-4 pt-14 md:pt-4">
-          <div className="mb-5 border-b border-orange-200 pb-3">
-            <h2 className="text-xl font-bold text-gray-800">Dashboard</h2>
-            <p className="text-sm text-gray-500 mt-1">Overview of your service requests and job activity</p>
-          </div>
-          <DashboardStats />
-          <ServiceRequestTable />
-          <JobSummaryTable />
-        </main>
+      <div className="min-h-screen bg-[#fffaf5] px-3 py-4 md:px-5 md:py-6">
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-5 lg:flex-row">
+          <Sidebar />
+
+          {/* pt-14 on mobile gives clearance for the floating hamburger button */}
+          <main className="flex-1 rounded-[1.75rem] border-2 border-gray-200 bg-white p-4 pt-14 md:p-6 md:pt-6">
+            <div className="mb-6 flex flex-col gap-3 border-b border-gray-100 pb-5 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-orange-500">
+                  Technician Hub
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-gray-900 md:text-3xl">
+                  Dashboard
+                </h2>
+              </div>
+              <div className="inline-flex items-center rounded-full border border-gray-200 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-600">
+                Your workload
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <DashboardStats />
+              <ServiceRequestTable />
+              <JobSummaryTable />
+            </div>
+          </main>
+        </div>
       </div>
+
       <Footer />
     </>
   );

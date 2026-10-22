@@ -332,7 +332,7 @@ export default function TechnicalExpertise({ userId }) {
   };
 
   return (
-    <div className="bg-[#ffffff80] shadow rounded-xl p-6 space-y-8">
+    <div className="bg-[#ffffff80] shadow rounded-xl p-6 space-y-8 border-2 border-gray-200">
       <h2 className="text-lg font-semibold">Technical Expertise</h2>
 
       <div>
@@ -341,7 +341,7 @@ export default function TechnicalExpertise({ userId }) {
           {labCategories.map((lab, i) => (
             <span
               key={i}
-              className="px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-700 border border-orange-200"
+              className="px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-700 border border-gray-200"
             >
               {lab.name}
             </span>
@@ -378,7 +378,7 @@ export default function TechnicalExpertise({ userId }) {
           {instrumentCategories.map((instrumentCat, i) => (
             <span
               key={i}
-              className="px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-700 border border-orange-200"
+              className="px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-700 border border-gray-200"
             >
               {instrumentCat.name}
             </span>
@@ -420,7 +420,7 @@ export default function TechnicalExpertise({ userId }) {
           {instruments.map((instrument, i) => (
             <span
               key={i}
-              className="px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-700 border border-orange-200"
+              className="px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-700 border border-gray-200"
             >
               {instrument.instrument_name}
             </span>
@@ -460,7 +460,7 @@ export default function TechnicalExpertise({ userId }) {
           {newInstruments.map((instrument, i) => (
             <span
               key={i}
-              className="px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-700 border border-orange-200"
+              className="px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-700 border border-gray-200"
             >
               {instrument.instrument_name}
             </span>

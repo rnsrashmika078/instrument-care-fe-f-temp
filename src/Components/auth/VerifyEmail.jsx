@@ -82,11 +82,28 @@ export default function EmailVerificationPage() {
     }
   };
 
-  const handleResendCode = () => {
+  const handleResendCode = async () => {
     if (!userId) return;
     setIsResending(true);
     setError("");
-    setTimeout(() => setIsResending(false), 3000);
+    try {
+      const response = await fetch(`${API_BASE}/api/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId }),
+      });
+      const result = await response.json();
+      if (result && result.success === true) {
+        toast.success("A new verification code has been sent to your email.");
+      } else {
+        toast.error(result?.message || "Failed to resend the code. Please try again.");
+      }
+    } catch (err) {
+      console.error("Resend failed:", err);
+      toast.error("Something went wrong. Please try again!");
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -150,7 +167,7 @@ export default function EmailVerificationPage() {
           <div className="md:w-7/12 bg-white flex flex-col justify-center px-5 sm:px-8 lg:px-11 py-8 md:min-h-[560px]">
             {/* Header */}
             <div className="text-center mb-[26px]">
-              <div className="w-[68px] h-[68px] rounded-full bg-[#fff7ec] border border-[rgba(238,147,16,0.25)] flex items-center justify-center mx-auto mb-[18px] text-[#ee9310]">
+              <div className="w-[68px] h-[68px] rounded-full bg-[#fff7ec] border border-[#e5e7eb] flex items-center justify-center mx-auto mb-[18px] text-[#ee9310]">
                 <svg
                   width="28"
                   height="28"
@@ -176,7 +193,7 @@ export default function EmailVerificationPage() {
 
             {/* Email chip */}
             {email && (
-              <div className="inline-flex items-center gap-2 mx-auto mt-[18px] mb-6 px-4 py-2 rounded-full border border-dashed border-[rgba(238,147,16,0.5)] bg-[#fffdf8] text-[13.5px] font-semibold text-[#111827]">
+              <div className="inline-flex items-center gap-2 mx-auto mt-[18px] mb-6 px-4 py-2 rounded-full border border-dashed border-[#e5e7eb] bg-[#fffdf8] text-[13.5px] font-semibold text-[#111827]">
                 <svg
                   width="14"
                   height="14"
@@ -213,7 +230,7 @@ export default function EmailVerificationPage() {
                   autoComplete="one-time-code"
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
-                  className="w-[46px] h-[56px] text-center text-2xl font-bold rounded-[10px] border-[1.5px] border-[#e5e7eb] bg-white text-[#111827] focus:outline-none focus:border-[#ee9310] focus:ring-[4px] focus:ring-[rgba(238,147,16,0.18)] transition-all duration-200"
+                  className="w-[46px] h-[56px] text-center text-2xl font-bold rounded-[10px] border-[1.5px] border-[#e5e7eb] bg-white text-[#111827] focus:outline-none focus:border-[#e5e7eb] focus:ring-[4px] focus:ring-[rgba(156,163,175,0.4)] transition-all duration-200"
                 />
               ))}
             </div>
@@ -240,7 +257,7 @@ export default function EmailVerificationPage() {
                 type="button"
                 onClick={handleResendCode}
                 disabled={isResending}
-                className="inline-block h-[42px] leading-[42px] px-6 rounded-[9px] bg-white border-[1.5px] border-[#ee9310] text-[#ee9310] text-sm font-semibold cursor-pointer transition-all duration-200 hover:bg-[#ee9310] hover:text-white hover:shadow-[0_4px_12px_rgba(238,147,16,0.28)] disabled:opacity-65 disabled:cursor-not-allowed"
+                className="inline-block h-[42px] leading-[42px] px-6 rounded-[9px] bg-white border-[1.5px] border-[#e5e7eb] text-[#ee9310] text-sm font-semibold cursor-pointer transition-all duration-200 hover:bg-[#ee9310] hover:text-white hover:shadow-[0_4px_12px_rgba(238,147,16,0.28)] disabled:opacity-65 disabled:cursor-not-allowed"
               >
                 {isResending ? "Sending..." : "Resend Code"}
               </button>

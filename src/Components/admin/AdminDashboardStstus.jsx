@@ -1,12 +1,10 @@
-import { fetchWithAuth } from '../utils/api';
 import React, { useState, useEffect } from "react";
 import { API_BASE } from "../../config";
 import { UsersIcon, WrenchScrewdriverIcon, CubeIcon, ClipboardDocumentCheckIcon } from "@heroicons/react/24/outline";
 
-export default function AdminDashboardStats({ technicianId }) {
+export default function AdminDashboardStats() {
   const token = sessionStorage.getItem("token");
   const [stats, setStats] = useState([
-    { label: "Owners", value: 0, icon: UsersIcon, color: "from-orange-400 to-orange-300" },
     { label: "Technicians", value: 0, icon: WrenchScrewdriverIcon, color: "from-orange-400 to-orange-300" },
     { label: "Instruments", value: 0, icon: CubeIcon, color: "from-orange-400 to-orange-300" },
     { label: "Service Requests", value: 0, icon: ClipboardDocumentCheckIcon, color: "from-orange-400 to-orange-300" },
@@ -29,10 +27,6 @@ export default function AdminDashboardStats({ technicianId }) {
         //  Update all dashboard values from backend response
         setStats((prevStats) =>
           prevStats.map((stat) => {
-            if (stat.label === "Owners") {
-              return { ...stat, value: data.owner_count || 0 };
-            }
-
             if (stat.label === "Technicians") {
               return { ...stat, value: data.technician_count || 0 };
             }
@@ -57,13 +51,13 @@ export default function AdminDashboardStats({ technicianId }) {
   }, []);
 
   return (
-    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {stats.map((stat, i) => {
         const Icon = stat.icon;
         return (
           <div
             key={i}
-            className="flex min-h-[148px] flex-col justify-center rounded-[1.5rem] border border-orange-100 bg-orange-50 p-5 text-gray-800 transition hover:border-orange-200"
+            className="flex min-h-[148px] flex-col justify-center rounded-[1.5rem] border border-gray-200 bg-white p-5 text-gray-800 transition hover:border-gray-300"
           >
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500 text-white">
               <Icon className="h-6 w-6" />

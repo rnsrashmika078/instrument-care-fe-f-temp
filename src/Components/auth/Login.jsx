@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import Bg from "../../assets/images/index11.jpg";
 import { API_BASE } from "../../config";
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = async () => {
     try {
@@ -43,30 +44,38 @@ export default function LoginPage() {
       if (result.message === "Login successful") {
         setError("");
 
+        // The API may return the role as a string (e.g. "10"), so normalize it.
+        const role = Number(result.role);
+
+        let dashboardPath = null;
+        if (role === 1) {
+          dashboardPath = "/admin/dashboard";
+        } else if (role === 10) {
+          dashboardPath = "/tech/dashboard";
+        } else if ([2, 3, 4, 5, 6, 7, 8, 9].includes(role)) {
+          setError("This portal is for technicians only. Client login is not supported here.");
+          return;
+        }
+
+        if (!dashboardPath) {
+          setError("Unauthorized role!");
+          return;
+        }
+
         sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("role", String(result.role));
+        sessionStorage.setItem("role", String(role));
         sessionStorage.setItem("user_id", String(result.id));
-        sessionStorage.setItem("technician_id", String(result.technician_id));
+        if (result.technician_id != null) {
+          sessionStorage.setItem(
+            "technician_id",
+            String(result.technician_id),
+          );
+        } else {
+          sessionStorage.removeItem("technician_id");
+        }
         sessionStorage.setItem("token", result.token);
 
-        if (
-          result.role === 8 ||
-          result.role === 9 ||
-          result.role === 7 ||
-          result.role === 6 ||
-          result.role === 5 ||
-          result.role === 4 ||
-          result.role === 3 ||
-          result.role === 2
-        ) {
-          navigate("/user/dashboard");
-        } else if (result.role === 10) {
-          navigate("/tech/dashboard");
-        } else if (result.role === 1) {
-          navigate("/admin/dashboard");
-        } else {
-          setError("Unauthorized role!");
-        }
+        const from = location.state?.from || dashboardPath; navigate(from, { replace: true });
       } else {
         setError("Invalid username or password!");
       }
@@ -81,7 +90,7 @@ export default function LoginPage() {
   };
 
   const inputClass =
-    "w-full h-12 px-3.5 pl-[42px] rounded-[9px] border-[1.5px] border-[#e5e7eb] bg-white text-[14.5px] text-[#111827] placeholder:text-[#9ca3af] placeholder:text-sm focus:outline-none focus:border-[#ee9310] focus:ring-[3.5px] focus:ring-[rgba(238,147,16,0.22)] transition-all duration-200";
+    "w-full h-12 px-3.5 pl-[42px] rounded-[9px] border-[1.5px] border-[#e5e7eb] bg-white text-[14.5px] text-[#111827] placeholder:text-[#9ca3af] placeholder:text-sm focus:outline-none focus:border-[#e5e7eb] focus:ring-[3.5px] focus:ring-[rgba(238,147,16,0.22)] transition-all duration-200";
 
   return (
     <div
@@ -165,10 +174,10 @@ export default function LoginPage() {
           <div className="md:w-7/12 bg-white flex flex-col justify-center px-5 sm:px-8 lg:px-11 py-8 md:min-h-[560px]">
             <div className="mb-6">
               <h1 className="text-[27px] font-bold text-[#111827] mb-1.5 tracking-tight">
-                Technician & Client Login
+                Technician Login
               </h1>
               <p className="text-[14.5px] text-[#6b7280]">
-                Welcome back! Sign in to access your technician or client dashboard.
+                Welcome back! Sign in to access your technician dashboard.
               </p>
             </div>
 
@@ -178,7 +187,7 @@ export default function LoginPage() {
                 Important
               </h4>
               <p className="text-sm text-gray-700 leading-relaxed mt-2">
-                This login is for <b>Technicians</b> and <b>Clients</b> registered with the{" "}
+                This login is for <b>Technicians</b> registered with the{" "}
                 <b>National Instrument Database (NID)</b>. Use your existing{" "}
                 <b>NID username</b> and <b>password</b> to sign in. No need to
                 create a new account.
@@ -282,10 +291,10 @@ export default function LoginPage() {
             {/* Options Row */}
             <div className="flex items-center justify-between gap-2 mb-[22px]">
               <Link
-                to="/auth/user-registration"
+                to="/auth/tech-registration"
                 className="text-[13.5px] font-semibold text-[#ee9310] no-underline transition-colors duration-200 hover:text-[#d88106] hover:underline"
               >
-                If you don't have account? SIGN UP
+                Don't have an account? Register as Technician
               </Link>
               <Link
                 to="/auth/email-entry-forgot-password"
@@ -307,3 +316,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

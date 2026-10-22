@@ -164,7 +164,7 @@ export default function PersonalInfo({ userId }) {
     };
 
     return (
-        <div className="bg-[#ffffff80] shadow-md rounded-xl p-6">
+        <div className="bg-[#ffffff80] shadow-md rounded-xl p-6 border-2 border-gray-200">
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Personal Information</h2>
             </div>
@@ -309,7 +309,7 @@ export default function PersonalInfo({ userId }) {
                         name="mobileNumber"
                         value={formData.mobileNumber}
                         onChange={handleChange}
-                        className="input w-full"
+                        className="input phone-prefix w-full"
                         maxLength="10"
                         placeholder="07XXXXXXXX"
                     />
@@ -323,7 +323,7 @@ export default function PersonalInfo({ userId }) {
                         name="phoneNumber"
                         value={formData.phoneNumber}
                         onChange={handleChange}
-                        className="input w-full"
+                        className="input phone-prefix w-full"
                         maxLength="10"
                         placeholder="0XXXXXXXXX"
                     />
@@ -418,7 +418,7 @@ export default function PersonalInfo({ userId }) {
                         name="supervisor_Contact_No"
                         value={formData.supervisor_Contact_No}
                         onChange={handleChange}
-                        className="input w-full"
+                        className="input phone-prefix w-full"
                         maxLength={10}
                     />
                 </div>

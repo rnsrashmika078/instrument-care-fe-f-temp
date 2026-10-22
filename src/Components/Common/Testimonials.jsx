@@ -41,7 +41,7 @@ export default function TestimonialSection() {
         {testimonials.map((testimonial, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg shadow-sm p-6 flex flex-col justify-between"
+            className="bg-white rounded-lg shadow-sm p-6 flex flex-col justify-between border-2 border-gray-200"
           >
             <div>
               <div className="text-yellow-400 text-xl mb-2">★★★★★</div>

@@ -14,7 +14,7 @@ export default function Technician_Profile() {
       <div className="flex flex-col md:flex-row h-full w-full p-2 md:p-4 gap-4 bg-orange-100">
         <Sidebar />
 
-        <main className="flex-1 bg-[#ffffff80] rounded-lg p-4">
+        <main className="flex-1 bg-[#ffffff80] rounded-lg p-4 border-2 border-gray-200">
           <ProfileForm />
 
         </main>

@@ -1,33 +1,75 @@
 import React, { useEffect, useState } from "react";
+import { FaCheck, FaEye } from "react-icons/fa";
 import { API_BASE } from "../../config";
+import ServiceRequestModal from "./ServiceRequestModal";
+import { formatDate } from "../utils/format";
+import { formatPhone } from "../utils/phone";
+import {
+  ActionButton,
+  FilterSelect,
+  IconButton,
+  IdTag,
+  RecordsBadge,
+  SearchInput,
+  StatusPill,
+  TableCard,
+  TableEmpty,
+  TableHead,
+  TableScroll,
+  TableSkeleton,
+  TableToolbar,
+  Td,
+  Th,
+  Tr,
+} from "../admin/TableUI";
+
+const STATUS_OPTIONS = [
+  { value: "All", label: "All Statuses" },
+  { value: "Pending", label: "Pending" },
+  { value: "In Progress", label: "In Progress" },
+  { value: "Completed", label: "Completed" },
+  { value: "Rejected", label: "Rejected" },
+  { value: "Pass", label: "Pass" },
+];
 
 export default function AllJobSummary() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   const token = sessionStorage.getItem("token");
 
-  //for search
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   const filteredJobs = jobs.filter((job) => {
-    const searchTerm = search.toLowerCase();
-    return (
-      (job.id?.toString() || "").includes(searchTerm) ||
-      (job.full_name || "").toLowerCase().includes(searchTerm) ||
-      (job.contact_number || "").toLowerCase().includes(searchTerm) ||
-      (job.email || "").toLowerCase().includes(searchTerm) ||
-      (job.institute_name || "").toLowerCase().includes(searchTerm) ||
-      (job.instrument_name || "").toLowerCase().includes(searchTerm) ||
-      (job.instrument_model || "").toLowerCase().includes(searchTerm) ||
-      (job.instrument_brand || "").toLowerCase().includes(searchTerm) ||
-      (job.instrument_manufacturer || "").toLowerCase().includes(searchTerm) ||
-      (job.instrument_product_testing_type || "").toLowerCase().includes(searchTerm) ||
-      (job.instrument_testing_parameter || "").toLowerCase().includes(searchTerm) ||
-      (job.issue_description || "").toLowerCase().includes(searchTerm) ||
-      (job.status || "").toLowerCase().includes(searchTerm)
-    );
+    const query = search.trim().toLowerCase();
+    const haystack = [
+      `SR/${job.id}`,
+      `SR-${String(job.id).padStart(4, "0")}`,
+      job.full_name,
+      job.contact_number,
+      formatPhone(job.contact_number),
+      job.email,
+      job.institute_name,
+      job.institute_address,
+      job.physical_address,
+      job.instrument_name,
+      job.instrument_model,
+      job.instrument_brand,
+      job.instrument_manufacturer,
+      job.issue_description,
+      job.status,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    const matchesSearch = !query || haystack.includes(query);
+    const matchesStatus = statusFilter === "All" || job.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
   });
 
   useEffect(() => {
@@ -38,14 +80,12 @@ export default function AllJobSummary() {
       return;
     }
 
-    fetch(`${API_BASE}/user/service-request/${techId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
+    fetch(`${API_BASE}/user/service-request/${techId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch job summary");
@@ -53,7 +93,6 @@ export default function AllJobSummary() {
         return res.json();
       })
       .then((data) => {
-        // Handle array or object structure based on backend response
         let allRequests = [];
         if (Array.isArray(data)) {
           allRequests = data;
@@ -71,7 +110,7 @@ export default function AllJobSummary() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [token]);
 
   const handleUpdateStatus = async (jobId) => {
     if (!jobId) {
@@ -81,44 +120,31 @@ export default function AllJobSummary() {
 
     setUpdatingId(jobId);
     try {
-      // Assuming a PUT request to update the status. Adjust endpoint if necessary.
-      const response = await fetch(
-        `${API_BASE}/service-request/status/${jobId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${sessionStorage.getItem("token") || ""}`
-          },
-          body: JSON.stringify({ status: "Completed" })
-        }
-      );
+      const response = await fetch(`${API_BASE}/service-request/status/${jobId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("token") || ""}`,
+        },
+        body: JSON.stringify({ status: "Completed" }),
+      });
 
-      // If backend returns 200/201, or if it succeeds
       if (response.ok) {
-        setJobs(prevJobs =>
-          prevJobs.map(job =>
-            job.id === jobId ? { ...job, status: "Completed" } : job
-          )
+        setJobs((prevJobs) =>
+          prevJobs.map((job) => (job.id === jobId ? { ...job, status: "Completed" } : job))
         );
         window.location.reload();
       } else {
         console.error("Failed to update status on server");
-        // Optimistically update anyway for demo purposes, or show an error
-        setJobs(prevJobs =>
-          prevJobs.map(job =>
-            job.id === jobId ? { ...job, status: "Completed" } : job
-          )
+        setJobs((prevJobs) =>
+          prevJobs.map((job) => (job.id === jobId ? { ...job, status: "Completed" } : job))
         );
         window.location.reload();
       }
     } catch (error) {
       console.error("Error updating status:", error);
-      // Optimistically update anyway in case the endpoint doesn't exist yet but UI needs to show it
-      setJobs(prevJobs =>
-        prevJobs.map(job =>
-          job.id === jobId ? { ...job, status: "Completed" } : job
-        )
+      setJobs((prevJobs) =>
+        prevJobs.map((job) => (job.id === jobId ? { ...job, status: "Completed" } : job))
       );
       window.location.reload();
     } finally {
@@ -128,133 +154,148 @@ export default function AllJobSummary() {
   };
 
   return (
-    <div className="bg-[#ffffff80] rounded-lg shadow-sm p-4 font-poppins w-full max-w-[1300px] mx-auto h-[calc(100vh-150px)] min-h-[400px] flex flex-col">
-      <div className="flex justify-between items-center mb-4 shrink-0">
-        <h3 className="font-bold">All Job Summary</h3>
-      </div>
-
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search records..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            // setCurrentPage(1); 
-          }}
-          className="w-full md:w-3/3 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
+    <>
+      <TableCard>
+        <TableHead
+          title="All Job Summary"
+          subtitle="Complete history of every job assigned to you"
         />
-      </div>
 
+        <TableToolbar>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by ID, client, institute, instrument…"
+          />
+          <FilterSelect
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={STATUS_OPTIONS}
+            className="sm:max-w-[10.5rem]"
+          />
+          <RecordsBadge count={filteredJobs.length} noun="jobs" />
+        </TableToolbar>
 
-      <div className="w-full flex-1 overflow-auto bg-white rounded-md border border-gray-200">
         {loading ? (
-          <p className="text-gray-500 italic p-4 text-center">
-            Loading job summaries...
-          </p>
+          <TableSkeleton rows={8} columns={8} />
+        ) : jobs.length === 0 ? (
+          <TableEmpty
+            title="No job summaries"
+            message="Jobs you accept will be listed here with their full history."
+          />
         ) : filteredJobs.length === 0 ? (
-          <p className="text-gray-500 italic p-4 text-center">
-            No matching job summaries found.
-          </p>
+          <TableEmpty
+            title="No matching jobs"
+            message="No jobs match the current search or status filter."
+            hint="Try clearing the filters"
+          />
         ) : (
-          <table className="w-full text-left text-sm border-collapse min-w-max">
-            <thead className="bg-gray-100 sticky top-0 z-10 shadow-sm">
+          <TableScroll>
+            <thead>
               <tr>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Request ID</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Client Name</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Contact Details</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Institute Details</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Instrument Name</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Instrument Details</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Problem Description</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Request Date</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Accepted Date</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Completed Date</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Status</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Action</th>
-                <th className="p-3 border border-gray-200 font-semibold whitespace-nowrap">Feedback</th>
+                <Th>Request</Th>
+                <Th>Client</Th>
+                <Th>Institute</Th>
+                <Th>Instrument</Th>
+                <Th>Problem</Th>
+                <Th>Requested On</Th>
+                <Th>Accepted On</Th>
+                <Th>Completed On</Th>
+                <Th>Status</Th>
+                <Th>Feedback</Th>
+                <Th align="center">Actions</Th>
               </tr>
             </thead>
+
             <tbody>
-              {filteredJobs.map((job, i) => (
-                <tr key={job.id || i} className="border-b hover:bg-[#ffffff80] transition duration-200">
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap text-gray-800 font-medium">SR/{job.id}</td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap text-gray-800">{job.full_name}</td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap">
-                    <div className="flex flex-col gap-1.5 text-gray-700">
-                      <div><span className="font-semibold text-gray-500">Mobile:</span> {job.contact_number}</div>
-                      <div><span className="font-semibold text-gray-500">Email:</span> {job.email}</div>
-                      <div><span className="font-semibold text-gray-500">Address:</span> {job.physical_address}</div>
-                    </div>
-                  </td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap">
-                    <div className="flex flex-col gap-1.5 text-gray-700">
-                      <div><span className="font-semibold text-gray-500">Name:</span> {job.institute_name}</div>
-                      <div><span className="font-semibold text-gray-500">Address:</span> {job.institute_address}</div>
-                    </div>
-                  </td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap font-medium text-gray-800">{job.instrument_name}</td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap">
-                    <div className="flex flex-col gap-1.5 text-gray-700">
-                      <div><span className="font-semibold text-gray-500">Brand:</span> {job.instrument_brand}</div>
-                      <div><span className="font-semibold text-gray-500">Model:</span> {job.instrument_model}</div>
-                      <div><span className="font-semibold text-gray-500">Manufacturer:</span> {job.instrument_manufacturer}</div>
-                      <div><span className="font-semibold text-gray-500">Manufacture Year:</span> {job.instrument_manufactured_year}</div>
-                      <div><span className="font-semibold text-gray-500">Testing Type:</span> {job.instrument_product_testing_type}</div>
-                      <div><span className="font-semibold text-gray-500">Testing Parameter:</span> {job.instrument_testing_parameter}</div>
-                      <div><span className="font-semibold text-gray-500">Consumption Pd:</span> {job.instrument_consumption_period}</div>
-                    </div>
-                  </td>
-                  {/* <td className="p-4 border border-gray-200 align-top max-w-[250px] break-words text-gray-800 whitespace-normal leading-relaxed">{job.issue_description}</td> */}
-                  <td className="p-4 border border-gray-200 align-top max-w-[250px] whitespace-normal break-words text-gray-800 leading-relaxed">
-                    {job.issue_description}
-                  </td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap text-gray-700">{job.created_at}</td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap text-gray-700">{job.start_date}</td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap text-gray-700">{job.end_date}</td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap">
-                    <span
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${job.status === "Completed" || job.status === "Pass"
-                        ? "bg-green-100 text-green-700"
-                        : job.status === "Rejected"
-                          ? "bg-red-100 text-red-700"
-                          : job.status === "In Progress"
-                            ? "bg-blue-100 text-blue-700"
-                            : job.status === "Pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-gray-100 text-gray-700"
-                        }`}
-                    >
-                      {job.status}
+              {filteredJobs.map((job) => (
+                <Tr key={job.id} onClick={() => setSelectedJob(job)}>
+                  <Td>
+                    <IdTag prefix="SR-" value={String(job.id).padStart(4, "0")} />
+                  </Td>
+                  <Td>{job.full_name}</Td>
+                  <Td>
+                    <span className="text-gray-600">{job.institute_name || "—"}</span>
+                  </Td>
+                  <Td>
+                    <span className="text-gray-600">{job.instrument_name}</span>
+                  </Td>
+                  <Td>
+                    <span className="line-clamp-2" title={job.issue_description}>
+                      {job.issue_description || "—"}
                     </span>
-                  </td>
-                  <td className="p-4 border border-gray-200 align-top whitespace-nowrap">
-                    {job.status === "In Progress" && (
-                      <button
-                        onClick={() => handleUpdateStatus(job.id)}
-                        disabled={updatingId === job.id}
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-semibold shadow transition duration-200 disabled:opacity-50 flex items-center justify-center min-w-[100px]"
-                      >
-                        {updatingId === job.id ? "Updating..." : "Complete"}
-                      </button>
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {formatDate(job.created_at)}
+                    </span>
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {formatDate(job.start_date)}
+                    </span>
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {formatDate(job.end_date)}
+                    </span>
+                  </Td>
+                  <Td>
+                    <StatusPill status={job.status} />
+                  </Td>
+                  <Td>
+                    {job.rate || job.review ? (
+                      <div className="max-w-[180px] space-y-0.5">
+                        {job.rate ? (
+                          <p className="text-xs font-semibold text-orange-600">
+                            Rating: {job.rate}
+                          </p>
+                        ) : null}
+                        {job.review ? (
+                          <p className="truncate text-xs text-gray-500" title={job.review}>
+                            {job.review}
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <span className="text-xs italic text-gray-300">—</span>
                     )}
-                  </td>
-                  <td className="p-4 border border-gray-200 align-top max-w-[250px] whitespace-normal break-words">
-                    <div className="flex flex-col gap-1.5 text-gray-700">
-                      <div>
-                        <span className="font-semibold text-gray-500">Rate:</span> {job.rate}
-                      </div>
-                      <div className="break-words">
-                        <span className="font-semibold text-gray-500">Review:</span> {job.review}
-                      </div>
+                  </Td>
+                  <Td align="center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      {job.status === "In Progress" ? (
+                        <ActionButton
+                          tone="green"
+                          icon={FaCheck}
+                          disabled={updatingId === job.id}
+                          title="Mark as completed"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUpdateStatus(job.id);
+                          }}
+                        >
+                          {updatingId === job.id ? "Updating…" : "Complete"}
+                        </ActionButton>
+                      ) : null}
+                      <IconButton
+                        tone="blue"
+                        icon={FaEye}
+                        title="View Details"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedJob(job);
+                        }}
+                      />
                     </div>
-                  </td>
-                </tr>
+                  </Td>
+                </Tr>
               ))}
             </tbody>
-          </table>
+          </TableScroll>
         )}
-      </div>
-    </div>
+      </TableCard>
+
+      <ServiceRequestModal request={selectedJob} onClose={() => setSelectedJob(null)} />
+    </>
   );
 }

@@ -42,7 +42,7 @@ export default function ProfileImageUpload({ formData, setFormData, handleChange
 
   return (
     <div className="flex flex-col items-center p-4">
-      <div className="border rounded-full flex items-center justify-center mb-2">
+      <div className="border border-gray-300 rounded-full flex items-center justify-center mb-2">
         <img
           src={previewImage}
           alt="Profile"
@@ -75,8 +75,8 @@ export default function ProfileImageUpload({ formData, setFormData, handleChange
             name="fullName"
             value={formData.fullName}
             onChange={safeHandleChange}
-            className="border rounded p-1 w-full font-normal bg-gray-200 
-                       focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+            className="border border-gray-300 rounded p-1 w-full font-normal bg-gray-200 
+                       focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
           />
         </label>
 
@@ -87,8 +87,8 @@ export default function ProfileImageUpload({ formData, setFormData, handleChange
             name="nic"
             value={formData.nic}
             onChange={safeHandleChange}
-            className="border rounded p-1 w-full font-normal bg-gray-200 
-                       focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+            className="border border-gray-300 rounded p-1 w-full font-normal bg-gray-200 
+                       focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
           />
         </label>
 
@@ -99,8 +99,8 @@ export default function ProfileImageUpload({ formData, setFormData, handleChange
             name="email"
             value={formData.email}
             onChange={safeHandleChange}
-            className="border rounded p-1 w-full font-normal bg-gray-200 
-                       focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+            className="border border-gray-300 rounded p-1 w-full font-normal bg-gray-200 
+                       focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
           />
         </label>
 
@@ -111,8 +111,8 @@ export default function ProfileImageUpload({ formData, setFormData, handleChange
             name="address"
             value={formData.address}
             onChange={safeHandleChange}
-            className="border rounded p-1 w-full font-normal bg-gray-200 
-                       focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+            className="border border-gray-300 rounded p-1 w-full font-normal bg-gray-200 
+                       focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
           />
         </label>
 
@@ -123,8 +123,8 @@ export default function ProfileImageUpload({ formData, setFormData, handleChange
             name="personalNumber"
             value={formData.personalNumber}
             onChange={safeHandleChange}
-            className="border rounded p-1 w-full font-normal bg-gray-200 
-                       focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+            className="phone-prefix border border-gray-300 rounded p-1 w-full font-normal bg-gray-200 
+                       focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
           />
         </label>
 
@@ -134,8 +134,8 @@ export default function ProfileImageUpload({ formData, setFormData, handleChange
             name="bio"
             value={formData.bio}
             onChange={safeHandleChange}
-            className="border rounded p-5 w-full font-normal bg-gray-200 
-                       focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+            className="border border-gray-300 rounded p-5 w-full font-normal bg-gray-200 
+                       focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
           />
         </label>
       </div>

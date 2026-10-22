@@ -1,4 +1,5 @@
 import { fetchWithAuth } from '../utils/api';
+import { formatPhone } from '../utils/phone';
 import { API_BASE } from "../../config";
 import React, { useState } from "react";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
@@ -93,7 +94,7 @@ export default function AllOwnerTable({ usersData }) {
   };
 
   return (
-    <div className="bg-[#ffffff80] rounded-lg shadow-sm p-4 font-poppins min-h-[720px]">
+    <div className="bg-[#ffffff80] rounded-lg shadow-sm p-4 font-poppins min-h-[720px] border-2 border-gray-200">
 
       {/* ------------------------ TABLE ------------------------ */}
       <div className="overflow-x-auto">
@@ -119,7 +120,7 @@ export default function AllOwnerTable({ usersData }) {
                   <tr key={i} className="border-b hover:bg-orange-50 transition-colors">
                     <td className="p-3">{user.first_name} {user.last_name}</td>
                     <td className="p-3">{user.email}</td>
-                    <td className="p-3">{user.mobile_number}</td>
+                    <td className="p-3">{formatPhone(user.mobile_number)}</td>
                     <td className="p-3 font-semibold text-green-600">{user.role}</td>
                     <td className="p-3">{user.created}</td>
                     <td className="p-3">
@@ -165,8 +166,8 @@ export default function AllOwnerTable({ usersData }) {
               <div>
                 <h3 className="font-semibold text-gray-700 mb-2">Contact Information</h3>
                 <p>Email: {viewingUser.email || "-"}</p>
-                <p>Mobile: {viewingUser.mobile_number || "-"}</p>
-                <p>Phone: {viewingUser.phone_number || "-"}</p>
+                <p>Mobile: {formatPhone(viewingUser.mobile_number) || "-"}</p>
+                <p>Phone: {formatPhone(viewingUser.phone_number) || "-"}</p>
                 <p>Address: {viewingUser.address || "-"}</p>
               </div>
 
@@ -211,8 +212,8 @@ export default function AllOwnerTable({ usersData }) {
 
               {/* CONTACT */}
               <input name="email" value={editingUser.email || ""} onChange={handleChange} placeholder="Email" className="border p-2 rounded" />
-              <input name="mobile_number" value={editingUser.mobile_number || ""} onChange={handleChange} placeholder="Mobile" className="border p-2 rounded" />
-              <input name="phone_number" value={editingUser.phone_number || ""} onChange={handleChange} placeholder="Phone" className="border p-2 rounded" />
+              <input name="mobile_number" value={editingUser.mobile_number || ""} onChange={handleChange} placeholder="Mobile" className="phone-prefix border p-2 rounded" />
+              <input name="phone_number" value={editingUser.phone_number || ""} onChange={handleChange} placeholder="Phone" className="phone-prefix border p-2 rounded" />
               <input name="address" value={editingUser.address || ""} onChange={handleChange} placeholder="Address" className="border p-2 rounded" />
 
               {/* BASIC */}

@@ -15,6 +15,9 @@ dist-ssr
 # Environment variables
 .env
 
+# Local AI tool scratch files (contain machine-local credentials)
+.autohand/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

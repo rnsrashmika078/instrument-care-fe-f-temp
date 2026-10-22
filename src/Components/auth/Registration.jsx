@@ -241,8 +241,8 @@ export default function NewUserRegistration() {
               ))}
             </select>
 
-            <input name="phone_number" placeholder="Phone Number" className="input" onChange={handleChange} />
-            <input name="mobile_number" placeholder="Mobile Number" className="input" onChange={handleChange} />
+            <input name="phone_number" placeholder="Phone Number" className="input phone-prefix" onChange={handleChange} />
+            <input name="mobile_number" placeholder="Mobile Number" className="input phone-prefix" onChange={handleChange} />
             <label className="flex items-center gap-2 mb-4">
               <input
                 type="checkbox"

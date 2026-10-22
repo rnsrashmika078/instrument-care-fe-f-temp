@@ -33,10 +33,10 @@ const Stakeholders = () => {
             Messages from Leading Stakeholders
           </h2>
           <div className="flex gap-2">
-            <button className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-orange-500 transition-colors">
+            <button className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-gray-500 transition-colors">
               <ChevronLeft className="w-4 h-4 text-gray-900" />
             </button>
-            <button className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-orange-500 transition-colors">
+            <button className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-gray-500 transition-colors">
               <ChevronRight className="w-4 h-4 text-gray-900" />
             </button>
           </div>
@@ -46,7 +46,7 @@ const Stakeholders = () => {
           {stakeholders.map((person) => (
             <div
               key={person.name}
-              className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-md transition-shadow"
+              className="bg-white rounded-lg p-6 border-2 border-gray-200 hover:shadow-md transition-shadow"
             >
               <Quote className="w-8 h-8 text-orange-500/30 mb-3" />
               <p className="text-gray-500 text-sm leading-relaxed mb-5">

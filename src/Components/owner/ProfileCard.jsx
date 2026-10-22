@@ -1,24 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import DefaultProfileImage from "../../assets/images/profile-image.jpeg";
-import { fetchWithAuth, assetUrl } from "../utils/api";
+import { assetUrl } from "../utils/api";
 import { API_BASE } from "../../config";
+import AreasOfTechnicalExpertiseView from "../Technician/AreasOfTechnicalExpertiseView";
 
-export default function ProfileCard() {
+// One labelled block in the identity column. Sections sit on the card's white
+// background separated by hairline rules, so the column reads as a single
+// profile summary rather than a stack of little boxes.
+function Section({ title, children }) {
+  return (
+    <section className="px-4 py-4">
+      <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500 mb-2">
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
+}
+
+function DetailRow({ label, value }) {
+  return (
+    <div className="flex items-start gap-2 text-xs">
+      <span className="w-28 flex-shrink-0 font-medium text-gray-500">{label}</span>
+      <span className="min-w-0 flex-1 text-gray-800">{value || "—"}</span>
+    </div>
+  );
+}
+
+export default function ProfileCard({ onTechLoaded }) {
   const { id } = useParams(); // get technician id from URL
   const [tech, setTech] = useState(null);
-  const [instruments, setInstruments] = useState([]);
-  const [instrumentsCategories, setInstrumentsCategories] = useState([]);
-  const [laboratoryCategories, setLaboratoryCategories] = useState([]);
-  const [workExperiences, setWorkExperiences] = useState([]);
-  const [certificates, setCertificates] = useState([]);
 
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
     const fetchTechnician = async () => {
       try {
-        const response = await fetchWithAuth(
+        const response = await fetch(
           `${API_BASE}/user/dashboard/${id}`,
           {
             method: "GET",
@@ -26,368 +45,97 @@ export default function ProfileCard() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
         if (!response.ok) throw new Error("Failed to fetch technician");
         const data = await response.json();
         setTech(data);
+        // Technical Expertise needs this userId but is rendered outside this
+        // card, so hand it up instead of fetching the same endpoint twice.
+        onTechLoaded?.(data.technician_user_id || data.user_id || "");
       } catch (error) {
         console.error("Error fetching technician:", error);
       }
     };
 
     fetchTechnician();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
-  useEffect(() => {
-    const fetchInstruments = async () => {
-      try {
-        const response = await fetch(
-          `${API_BASE}/service-request/${id}/instruments`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok) throw new Error("Failed to fetch instruments");
-
-        const data = await response.json();
-        console.log("Instrument", data.instruments);
-        setInstruments(data.instruments || []);
-      } catch (error) {
-        console.error("Error fetching instruments:", error);
-      }
-    };
-
-    if (id) {
-      fetchInstruments();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    const fetchInstrumentsCategories = async () => {
-      try {
-        const response = await fetch(
-          `${API_BASE}/service-request/${id}/instrument-categories`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok)
-          throw new Error("Failed to fetch instruments categories");
-
-        const data = await response.json();
-        console.log("Instrument Category", data);
-        setInstrumentsCategories(data.instrumentsCategories || []);
-      } catch (error) {
-        console.error("Error fetching instruments:", error);
-      }
-    };
-
-    if (id) {
-      fetchInstrumentsCategories();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    const fetchLaboratoryCategories = async () => {
-      try {
-        const response = await fetch(
-          `${API_BASE}/service-request/${id}/laboratory-categories`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok)
-          throw new Error("Failed to fetch laboratory categories");
-
-        const data = await response.json();
-        console.log("Lab Category", data);
-        setLaboratoryCategories(data.laboratoryCategories || []);
-      } catch (error) {
-        console.error("Error fetching laboratory categories:", error);
-      }
-    };
-
-    if (id) {
-      fetchLaboratoryCategories();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    const fetchTechnicianWorkExperience = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/tech/work-experience/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const result = await res.json();
-
-        setWorkExperiences(result.data || []);
-      } catch (error) {
-        console.error("Error fetching work experiences:", error);
-        setWorkExperiences([]);
-      }
-    };
-
-    if (id) {
-      fetchTechnicianWorkExperience();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    const fetchTechnicianCertificates = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/tech/certificates/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const result = await res.json();
-        console.log("From API:", result);
-        setCertificates(result.data || []);
-      } catch (error) {
-        console.error("Error fetching certificates:", error);
-        setCertificates([]);
-      }
-    };
-
-    if (id) {
-      fetchTechnicianCertificates();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    const arr = [
-      ...instruments,
-      ...instrumentsCategories,
-      ...laboratoryCategories,
-    ];
-    console.log("ARR", arr);
-  }, [instruments, instrumentsCategories, laboratoryCategories]);
 
   if (!tech) {
-    return <div className="p-4">Loading profile...</div>;
+    return (
+      <div className="bg-white rounded-xl shadow-sm border-2 border-gray-200 p-6 font-poppins text-sm text-gray-500">
+        Loading profile...
+      </div>
+    );
   }
 
+  // assetUrl returns null for an empty path, which would render a broken
+  // <img>. Fall back to the placeholder whenever no picture is stored.
   const profileImageUrl =
-    tech.picture !== null ? assetUrl(tech.picture) : DefaultProfileImage;
+    (tech.picture && assetUrl(tech.picture)) || DefaultProfileImage;
+
+  // `a + " " + b || "fallback"` never falls back: `+` binds tighter than `||`,
+  // so a missing name rendered "undefined undefined". Build the name first.
+  const name = [tech.first_name, tech.last_name]
+    .filter((part) => part && String(part).trim())
+    .join(" ");
+  const fullName = name || "Technician";
+  const displayName = [tech.title, fullName].filter(Boolean).join(" ");
 
   return (
-    <div className="bg-[#ffffff80] rounded-xl shadow-sm p-6 font-poppins flex flex-col gap-6">
-      {/* Profile Header */}
-      <div className="flex items-center gap-4 border-b pb-4">
+    <div className="bg-white rounded-xl shadow-sm border-2 border-gray-200 font-poppins h-full flex flex-col">
+      {/* Identity */}
+      <div className="flex flex-col items-center text-center px-4 pt-6 pb-5">
         <img
           src={profileImageUrl}
-          alt={tech.first_name + " " + tech.last_name || "Profile"}
-          className="h-20 w-20 rounded-full object-cover border border-gray-300 hover:scale-105 transition"
+          alt={fullName}
+          className="h-24 w-24 rounded-full object-cover ring-2 ring-gray-100 hover:scale-105 transition flex-shrink-0"
         />
-        <div>
-          <h2 className="text-lg font-bold">
-            {tech.title} {tech.first_name + " " + tech.last_name || "N/A"}
-          </h2>
-          <p className="text-sm text-gray-500">{tech.designation || "-"}</p>
-        </div>
-      </div>
-
-      {/* Technical Expertise */}
-      <div className="bg-white rounded-lg p-4 shadow-sm">
-        <h3 className="font-bold mb-3 text-gray-800">Technical Expertise</h3>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse">
-            <thead>
-              <tr className="bg-orange-50 border-b-2 border-orange-200">
-                <th className="text-left px-4 py-3 font-semibold text-gray-700">
-                  Instrument
-                </th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-700">
-                  Instrument Category
-                </th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-700">
-                  Laboratory Category
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Instruments Row */}
-              <tr className="border-b border-gray-200 hover:bg-gray-50 transition">
-                <td className="px-4 py-3 align-top">
-                  <div className="flex flex-wrap gap-2">
-                    {instruments.length > 0 ? (
-                      instruments.map((item, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold whitespace-nowrap"
-                        >
-                          {item.instrument_name || item.custom_category}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-gray-400 text-xs">N/A</span>
-                    )}
-                  </div>
-                </td>
-                <td className="px-4 py-3 align-top">
-                  <div className="flex flex-wrap gap-2">
-                    {instrumentsCategories.length > 0 ? (
-                      instrumentsCategories.map((item, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold whitespace-nowrap"
-                        >
-                          {item.name || item.custom_category}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-gray-400 text-xs">N/A</span>
-                    )}
-                  </div>
-                </td>
-                <td className="px-4 py-3 align-top">
-                  <div className="flex flex-wrap gap-2">
-                    {laboratoryCategories.length > 0 ? (
-                      laboratoryCategories.map((item, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold whitespace-nowrap"
-                        >
-                          {item.name || item.custom_category}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-gray-400 text-xs">N/A</span>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* About */}
-      <div className="bg-white rounded-lg p-4 shadow-sm">
-        <h3 className="font-bold mb-2 text-gray-800">About</h3>
-        <p className="text-sm text-gray-600 leading-relaxed">
-          {tech.bio || "No description available"}
-        </p>
-      </div>
-
-      {/* Institute */}
-      <div className="bg-white rounded-lg p-4 shadow-sm">
-        <h3 className="font-bold mb-2 text-gray-800">Institute</h3>
-        <p className="text-sm text-gray-600">
-          {tech.designation || "-"} <br />
-          {tech.institute_name || "-"}
-        </p>
-      </div>
-
-      {/* Certificates */}
-      <div className="bg-white rounded-lg p-4 shadow-sm">
-        <h3 className="font-bold mb-3 text-gray-800">Certificates</h3>
-
-        {certificates.length > 0 ? (
-          <div className="flex flex-col gap-3">
-            {certificates.map((c, i) => (
-              <div
-                key={i}
-                className="border border-gray-200 rounded-lg p-3 bg-gray-50"
-              >
-                {/* Certificate Name */}
-                <p className="font-semibold text-gray-800">
-                  {c.certificate_name}
-                </p>
-
-                {/* Issuing Organization */}
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium text-gray-500">Issued By: </span>
-                  {c.oem_company_name}
-                </p>
-
-                {/* Details */}
-                <div className="text-xs text-gray-500 mt-2 flex flex-col gap-1">
-                  <div>
-                    <span className="font-medium">Instrument: </span>
-                    {c.instrument_name || "N/A"}
-                  </div>
-
-                  <div>
-                    <span className="font-medium">Issue Date: </span>
-                    {c.issue_date
-                      ? new Date(c.issue_date).toLocaleDateString()
-                      : "N/A"}
-                  </div>
-
-                  <div>
-                    <span className="font-medium">Expiry Date: </span>
-                    {c.expiry_date
-                      ? new Date(c.expiry_date).toLocaleDateString()
-                      : "N/A"}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <span className="text-gray-400 text-xs">
-            No certificates available
+        <h2 className="mt-3 text-base font-bold text-gray-900 leading-snug">
+          {displayName}
+        </h2>
+        {tech.designation && (
+          <p className="mt-0.5 text-sm text-gray-600">{tech.designation}</p>
+        )}
+        {tech.institute_name && (
+          <p className="mt-1.5 text-xs text-gray-500">{tech.institute_name}</p>
+        )}
+        {tech.district && (
+          <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-600">
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            {tech.district}
           </span>
         )}
       </div>
 
-      {/* Experience */}
-      <div className="bg-white rounded-lg p-4 shadow-sm">
-        <h3 className="font-bold mb-3 text-gray-800">Experience</h3>
+      <div className="border-t border-gray-100" />
 
-        {workExperiences.length > 0 ? (
-          <div className="flex flex-col gap-3">
-            {workExperiences.map((exp, i) => (
-              <div
-                key={i}
-                className="border border-gray-200 rounded-lg p-3 bg-gray-50"
-              >
-                <p className="font-semibold text-gray-800">
-                  {exp.position_title}
-                </p>
-
-                <p className="text-sm text-gray-600">{exp.organization_name}</p>
-
-                <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-4">
-                  <span>
-                    <b>Years:</b> {exp.years_of_experience}
-                  </span>
-                  <span>
-                    <b>From:</b> {new Date(exp.start_date).toLocaleDateString()}
-                  </span>
-                  <span>
-                    <b>To:</b> {new Date(exp.end_date).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <span className="text-gray-400 text-xs">No experience available</span>
+      <Section title="About">
+        {tech.bio && (
+          <p className="text-sm text-gray-600 leading-relaxed">{tech.bio}</p>
         )}
-      </div>
+      </Section>
+
+      <div className="border-t border-gray-100" />
+
+      <Section title="Institute">
+        <div className="space-y-2">
+          <DetailRow label="Designation" value={tech.designation} />
+          <DetailRow label="Institute" value={tech.institute_name} />
+          <DetailRow label="Email" value={tech.email} />
+          <DetailRow label="Mobile" value={tech.mobile_number} />
+        </div>
+      </Section>
+
+      <div className="border-t border-gray-100" />
+
+      <Section title="Service Coverage & Availability">
+        <AreasOfTechnicalExpertiseView technicianId={id} />
+      </Section>
     </div>
   );
 }

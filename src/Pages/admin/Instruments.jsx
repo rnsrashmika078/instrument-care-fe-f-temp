@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../../Components/Technician/Navbar'
 import Admin_Sidebar from '../../Components/admin/Sidebar'
 import AllInstrument from '../../Components/admin/AdminAllInstrument';
+import { TableCard, TableSkeleton } from '../../Components/admin/TableUI';
 import Footer from '../../Components/Common/Footer';
 import { API_BASE } from '../../config';
 
 export default function All_Instruments() {
   const [instruments, setInstruments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
@@ -30,6 +32,8 @@ export default function All_Instruments() {
         }
       } catch (error) {
         console.error('Error fetching instruments:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -40,13 +44,17 @@ export default function All_Instruments() {
     <>
       <Navbar />
 
-      <div className="flex flex-col md:flex-row h-full w-full p-2 md:p-4 gap-4 bg-orange-100">
+      <div className="flex w-full flex-col gap-4 bg-orange-50 p-2 md:h-full md:flex-row md:p-4">
         <Admin_Sidebar />
 
-        {/* Main Content */}
-        <main className="flex-1 bg-[#ffffff80] rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-4">All Instruments</h2>
-          <AllInstrument instrumentsData={instruments} />
+          <main className="min-w-0 flex-1 pt-14 md:pt-0">
+          {loading ? (
+            <TableCard>
+              <TableSkeleton rows={8} columns={5} />
+            </TableCard>
+          ) : (
+            <AllInstrument instrumentsData={instruments} />
+          )}
         </main>
       </div>
 

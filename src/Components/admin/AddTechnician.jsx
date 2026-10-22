@@ -69,7 +69,7 @@ export default function TechnicianRegisterPage() {
     };
 
     return (
-        <div className="w-full h-full flex items-center justify-center bg-white p-6 rounded-2xl">
+        <div className="w-full h-full flex items-center justify-center bg-white p-6 rounded-2xl border-2 border-gray-200">
 
             {/* Card Container */}
             <div className="w-full max-w-2xl bg-white p-8 md:p-10">
@@ -109,7 +109,7 @@ export default function TechnicianRegisterPage() {
                     <input
                         type="text"
                         placeholder="Phone Number"
-                        className="input md:col-span-2"
+                        className="input phone-prefix md:col-span-2"
                         value={formData.mobile_number}
                         onChange={(e) => setFormData({ ...formData, mobile_number: e.target.value })}
                     />

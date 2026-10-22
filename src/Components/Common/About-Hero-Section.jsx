@@ -33,7 +33,7 @@ export default function AboutHero() {
         {/* Vision and Mission - Side-by-side Cards with Top-Centered Icon & Title */}
         <div className="mt-12 grid md:grid-cols-2 gap-8">
           {/* Mission Card */}
-          <div className="bg-white/70 shadow-xl border-l-4 border-orange-400 rounded-xl p-6 flex flex-col items-center text-center">
+          <div className="bg-white/70 shadow-xl border-l-4 border-gray-400 rounded-xl p-6 flex flex-col items-center text-center">
             <div className="flex flex-col items-center mb-4">
               {/* <div className="bg-orange-500 text-white p-4 rounded-full mb-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -48,7 +48,7 @@ export default function AboutHero() {
           </div>
 
           {/* Vision Card */}
-          <div className="bg-white/70 shadow-xl border-l-4 border-yellow-400 rounded-xl p-6 flex flex-col items-center text-center">
+          <div className="bg-white/70 shadow-xl border-l-4 border-gray-400 rounded-xl p-6 flex flex-col items-center text-center">
             <div className="flex flex-col items-center mb-4">
               {/* <div className="bg-yellow-500 text-white p-4 rounded-full mb-2">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

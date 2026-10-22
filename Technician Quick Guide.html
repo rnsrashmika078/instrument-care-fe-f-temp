@@ -1,0 +1,1052 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Technician Quick Guide - National Instrument Database</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", "Calibri", Arial, sans-serif;
+    color: #1f2937;
+    font-size: 10.4pt;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ---------- Cover ---------- */
+  .cover {
+    height: 258mm;
+    border-radius: 14px;
+    background: linear-gradient(150deg, #ee9310 0%, #d88106 55%, #b96f04 100%);
+    color: #fff;
+    padding: 30mm 18mm 18mm 18mm;
+    display: flex;
+    flex-direction: column;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::after {
+    content: "";
+    position: absolute;
+    width: 300px; height: 300px;
+    right: -110px; top: -110px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.09);
+  }
+  .cover::before {
+    content: "";
+    position: absolute;
+    width: 220px; height: 220px;
+    left: -90px; bottom: -90px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+  }
+  .cover-badge {
+    display: inline-block;
+    align-self: flex-start;
+    border: 1.4px solid rgba(255,255,255,0.45);
+    background: rgba(255,255,255,0.18);
+    border-radius: 999px;
+    padding: 6px 15px;
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+  }
+  .cover h1 {
+    font-size: 34pt;
+    line-height: 1.1;
+    margin: 14mm 0 4mm 0;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+  }
+  .cover .sub {
+    font-size: 14pt;
+    font-weight: 600;
+    opacity: 0.95;
+    margin-bottom: 3mm;
+  }
+  .cover .desc {
+    font-size: 10.5pt;
+    line-height: 1.6;
+    opacity: 0.9;
+    max-width: 130mm;
+  }
+  .cover-flow {
+    margin-top: 12mm;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .cover-flow span {
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 9.2pt;
+    font-weight: 600;
+  }
+  .cover-foot {
+    margin-top: auto;
+    font-size: 9.5pt;
+    opacity: 0.95;
+    border-top: 1.4px solid rgba(255,255,255,0.35);
+    padding-top: 5mm;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ---------- Headings ---------- */
+  h2.sec {
+    font-size: 16pt;
+    color: #b96f04;
+    border-bottom: 2.5px solid #f5c88a;
+    padding-bottom: 5px;
+    margin: 0 0 5mm 0;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 12pt;
+    color: #1f2937;
+    margin: 7mm 0 3mm 0;
+    padding-left: 10px;
+    border-left: 4px solid #ee9310;
+    font-weight: 700;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 10.6pt;
+    color: #b96f04;
+    margin: 5mm 0 2mm 0;
+    font-weight: 700;
+    page-break-after: avoid;
+  }
+  p { margin: 0 0 3mm 0; }
+  ul, ol { margin: 0 0 3mm 0; padding-left: 6mm; }
+  li { margin-bottom: 1.4mm; }
+  strong { color: #111827; }
+
+  .step-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16pt;
+    color: #b96f04;
+    border-bottom: 2.5px solid #f5c88a;
+    padding-bottom: 5px;
+    margin: 0 0 5mm 0;
+    font-weight: 800;
+    page-break-before: always;
+    page-break-after: avoid;
+  }
+  .step-title.first { page-break-before: avoid; }
+  .step-num {
+    flex: 0 0 auto;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #ee9310;
+    color: #fff;
+    font-size: 12pt;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- Tables ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 4mm 0;
+    font-size: 9.4pt;
+  }
+  thead th {
+    background: #fdf3e3;
+    color: #92400e;
+    text-align: left;
+    font-weight: 700;
+    padding: 7px 9px;
+    border: 1px solid #f0d5a8;
+  }
+  tbody td {
+    padding: 6px 9px;
+    border: 1px solid #e5e7eb;
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) td { background: #fafafa; }
+  tbody tr { page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  .req { color: #dc2626; font-weight: 700; }
+  .opt { color: #6b7280; }
+
+  /* ---------- Boxes ---------- */
+  .box {
+    border-radius: 9px;
+    padding: 9px 12px;
+    margin: 0 0 4mm 0;
+    font-size: 9.6pt;
+    page-break-inside: avoid;
+  }
+  .box p:last-child { margin-bottom: 0; }
+  .box ul { margin-bottom: 0; }
+  .tip    { background: #eff6ff; border-left: 4px solid #2563eb; }
+  .warn   { background: #fffbeb; border-left: 4px solid #d97706; }
+  .note   { background: #f0fdf4; border-left: 4px solid #16a34a; }
+  .danger { background: #fef2f2; border-left: 4px solid #dc2626; }
+  .box b { display: block; margin-bottom: 2mm; }
+
+  code {
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 0.5px 4px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 9pt;
+    color: #b91c1c;
+  }
+
+  /* ---------- Flow diagram ---------- */
+  .flow {
+    display: flex;
+    align-items: stretch;
+    margin: 0 0 5mm 0;
+    page-break-inside: avoid;
+  }
+  .flow-box {
+    flex: 1;
+    border: 1.6px solid #f0d5a8;
+    background: #fffaf1;
+    border-radius: 9px;
+    padding: 8px 9px;
+    text-align: center;
+  }
+  .flow-box .t { font-weight: 800; color: #b96f04; font-size: 9.8pt; display: block; }
+  .flow-box .d { font-size: 8.4pt; color: #4b5563; display: block; margin-top: 2px; }
+  .flow-arrow {
+    align-self: center;
+    padding: 0 6px;
+    color: #ee9310;
+    font-size: 14pt;
+    font-weight: 800;
+  }
+
+  /* ---------- Cards ---------- */
+  .cards { display: flex; gap: 10px; margin: 0 0 4mm 0; page-break-inside: avoid; }
+  .card {
+    flex: 1;
+    border: 1.4px solid #e5e7eb;
+    border-radius: 9px;
+    padding: 10px 11px;
+    background: #fff;
+  }
+  .card .ch { font-weight: 800; color: #1f2937; font-size: 10pt; margin-bottom: 3mm; }
+  .card ul { padding-left: 5mm; margin-bottom: 0; font-size: 9.2pt; }
+
+  .pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 8.4pt;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+  }
+  .p-pending   { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+  .p-submitted { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+  .p-approved  { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+  .p-declined  { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+  /* ---------- Screenshots ---------- */
+  figure {
+    margin: 0 0 5mm 0;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+  figure img {
+    width: auto;
+    max-width: 100%;
+    max-height: 100mm;
+    display: block;
+    margin: 0 auto;
+    border: 1.2px solid #d1d5db;
+    border-radius: 7px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+  }
+  figure.half img { max-width: 76%; }
+  figcaption {
+    font-size: 8.6pt;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 3px;
+  }
+
+  .pagebreak { page-break-before: always; }
+
+  .toc {
+    background: #fffaf1;
+    border: 1.4px solid #f0d5a8;
+    border-radius: 9px;
+    padding: 9px 13px;
+    margin-bottom: 5mm;
+    page-break-inside: avoid;
+  }
+  .toc ol { margin: 0; padding-left: 6mm; columns: 2; column-gap: 10mm; }
+  .toc li { margin-bottom: 1.6mm; font-size: 9.6pt; }
+
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li { padding-left: 7mm; position: relative; margin-bottom: 2mm; }
+  .checklist li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 1.4mm;
+    width: 4mm; height: 4mm;
+    border: 1.5px solid #ee9310;
+    border-radius: 3px;
+    background: #fff;
+  }
+
+  footer {
+    margin-top: 8mm;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 3mm;
+    font-size: 8.4pt;
+    color: #9ca3af;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <span class="cover-badge">National Instrument Database &middot; NSF Sri Lanka</span>
+  <h1>Technician<br/>Quick Guide</h1>
+  <div class="sub">Register &rarr; Complete Your Technical Profile &rarr; Get Approved &rarr; Start Working</div>
+  <div class="desc">
+    A step-by-step guide for technicians who want to register on the National Instrument Database,
+    build a complete technical profile, obtain approval, and start receiving service requests
+    from instrument owners across the country.
+  </div>
+
+  <div class="cover-flow">
+    <span>1 &nbsp;Register</span>
+    <span>2 &nbsp;Verify Email</span>
+    <span>3 &nbsp;Sign In</span>
+    <span>4 &nbsp;Technical Profile</span>
+    <span>5 &nbsp;Supervisor Consent</span>
+    <span>6 &nbsp;Approval</span>
+    <span>7 &nbsp;Accept Jobs</span>
+  </div>
+
+  <div class="cover-foot">
+    <div>
+      <strong>System Administrator</strong><br/>
+      +94 (0)11 2 696771 &nbsp;&middot;&nbsp; Ext: 191, 126<br/>
+      nid@nsf.gov.lk
+    </div>
+    <div style="text-align:right">
+      <strong>Audience</strong><br/>
+      New &amp; existing technicians<br/>
+      (Internal quick-reference)
+    </div>
+  </div>
+</div>
+
+<!-- ================= CONTENTS ================= -->
+<h2 class="sec">Contents</h2>
+<div class="toc">
+  <ol>
+    <li>Before You Start &mdash; What You Need</li>
+    <li>Step 1 &mdash; Register as a Technician</li>
+    <li>Step 2 &mdash; Verify Your Email (OTP)</li>
+    <li>Step 3 &mdash; Sign In to Your Account</li>
+    <li>Step 4 &mdash; Complete the Technical Profile</li>
+    <li>Step 5 &mdash; Supervisor Confirmation</li>
+    <li>Step 6 &mdash; Get Approved</li>
+    <li>Step 7 &mdash; Start Working on Requests</li>
+    <li>Troubleshooting &amp; Common Errors</li>
+    <li>One-Page Final Checklist</li>
+  </ol>
+</div>
+
+<h2 class="sec">1. Before You Start &mdash; What You Need</h2>
+
+<p>The whole process is one continuous journey. Nothing is optional except where noted, and you cannot
+skip ahead &mdash; the system will not send your profile for review until every required section is
+complete and all four Terms and Conditions are accepted.</p>
+
+<div class="cards">
+  <div class="card">
+    <div class="ch">Identity &amp; Contact</div>
+    <ul>
+      <li>NIC number (9 digits + V/X, or 12 digits)</li>
+      <li>Mobile number &mdash; 10 digits starting with <code>0</code></li>
+      <li>Email address you can open (needed for OTP and supervisor invite)</li>
+      <li>Password &mdash; minimum 6 characters</li>
+      <li>Title (Mr / Mrs / Miss) and Name with Initials</li>
+      <li>Residential address and district</li>
+      <li>A clear passport-size photo (optional)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="ch">Institute &amp; Supervisor</div>
+    <ul>
+      <li>Your institute name (picked from the system list &mdash; it is searchable, not free text)</li>
+      <li>Your designation at that institute</li>
+      <li>Supervisor name</li>
+      <li>Supervisor designation</li>
+      <li>Supervisor email address</li>
+      <li>Supervisor contact number (10 digits starting with <code>0</code>)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="ch">Professional Evidence</div>
+    <ul>
+      <li>Technical expertise: the laboratory categories, instrument categories, instruments and care categories you actually work with</li>
+      <li>At least one employment entry (organization, position, start date)</li>
+      <li>At least one certificate (name and number, ideally the scanned file)</li>
+      <li>Related work history (optional but strongly recommended)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="warn">
+  <b>Heads-up on the supervisor step</b>
+  <p>If you answer <strong>Yes</strong> to &ldquo;Do you have a supervisor?&rdquo;, your profile will
+  <em>not</em> be approvable until that supervisor opens the emailed link and records consent.
+  This is the single most common reason a technician appears stuck. See Step 5.</p>
+</div>
+
+<h2 class="sec">2. The Journey at a Glance</h2>
+
+<div class="flow">
+  <div class="flow-box"><span class="t">Register</span><span class="d">Account created</span></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box"><span class="t">Verify Email</span><span class="d">6-digit OTP</span></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box"><span class="t">Sign In</span><span class="d">Technician dashboard</span></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box"><span class="t">Fill Profile</span><span class="d">7 sections</span></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box"><span class="t">Submit</span><span class="d">Accept 4 terms</span></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box"><span class="t">Consent</span><span class="d">Supervisor (if any)</span></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box"><span class="t">Approved</span><span class="d">Admin review</span></div>
+</div>
+
+<p>Your account status moves through four values. This single value controls what you can and cannot do
+in the system, and it is the fastest way to understand where you are.</p>
+
+<table>
+  <thead>
+    <tr><th style="width:20%">Status</th><th style="width:44%">What it means</th><th style="width:36%">What you see in the sidebar</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="pill p-pending">PENDING</span></td>
+      <td>Account created, but the profile has not been submitted yet.</td>
+      <td>Red badge &mdash; <strong>Not Approved</strong></td>
+    </tr>
+    <tr>
+      <td><span class="pill p-submitted">SUBMITTED</span></td>
+      <td>All four Terms and Conditions accepted. Your profile is now in the review queue.</td>
+      <td>Red badge &mdash; <strong>Not Approved</strong> (until the admin acts)</td>
+    </tr>
+    <tr>
+      <td><span class="pill p-approved">APPROVED</span></td>
+      <td>Administrator has approved you. Service requests can be accepted.</td>
+      <td>Green badge &mdash; <strong>Approved</strong></td>
+    </tr>
+    <tr>
+      <td><span class="pill p-declined">DECLINED</span></td>
+      <td>Administrator has declined the profile. Fix the details and re-submit.</td>
+      <td>Red badge &mdash; <strong>Not Approved</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ================= STEP 1 ================= -->
+<div class="step-title"><span class="step-num">1</span> Register as a Technician</div>
+
+<p>Open the technician sign-in page and click <strong>&ldquo;Register as Technician&rdquo;</strong> on the
+login screen (the link under the login form, or the technician banner button). You land on the
+<strong>Technician Registration</strong> page, which asks for six fields in two blocks.</p>
+
+<figure class="half">
+  <img src="User Guide Images/Technician Registeration Page.png" alt="Technician Registration page" style="max-height:72mm" />
+  <figcaption>Figure 1 &mdash; The Technician Registration page, reached from the technician sign-in screen.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:26%">Field</th><th style="width:14%">Required</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>First Name <span class="req">*</span></td><td><span class="req">Required</span></td><td>Section 1 &mdash; Personal Information. Enter your first name.</td></tr>
+    <tr><td>Last Name <span class="req">*</span></td><td><span class="req">Required</span></td><td>Section 1 &mdash; Personal Information. Enter your last name.</td></tr>
+    <tr><td>Mobile Number <span class="req">*</span></td><td><span class="req">Required</span></td><td>Section 1 &mdash; Personal Information. 10 digits, e.g. <code>0771234567</code>.</td></tr>
+    <tr><td>Email Address (User Name) <span class="req">*</span></td><td><span class="req">Required</span></td><td>Section 2 &mdash; Account Credentials. Format <code>name@example.com</code>. This is also your login user name and the address that receives the verification code.</td></tr>
+    <tr><td>Password <span class="req">*</span></td><td><span class="req">Required</span></td><td>Section 2 &mdash; Account Credentials. Minimum 6 characters. Use the eye icon to reveal what you typed.</td></tr>
+    <tr><td>Confirm Password <span class="req">*</span></td><td><span class="req">Required</span></td><td>Section 2 &mdash; Account Credentials. Must match the password exactly.</td></tr>
+  </tbody>
+</table>
+
+<p>Click the orange <strong>Register Account</strong> button. On success a message appears saying the
+OTP has been sent, and you are taken straight to the email verification screen.</p>
+
+<div class="note">
+  <b>Already registered?</b>
+  <p>If the email is already in the system you will see an error under the Email field. Use
+  <strong>Sign In here</strong> at the bottom of the page instead, or reset the password via
+  <strong>Forgot Password</strong> on the login screen.</p>
+</div>
+
+<!-- ================= STEP 2 ================= -->
+<div class="step-title"><span class="step-num">2</span> Verify Your Email (OTP)</div>
+
+<p>Immediately after registration, a <strong>6-digit verification code</strong> is emailed to the address
+you just entered. The verification screen shows the target address so you can confirm you are on the
+right account.</p>
+
+<figure>
+  <img src="User Guide Images/screencapture-localhost-5173-auth-verify-email-2025-12-11-10_46_49.png" alt="Verify your email" />
+  <figcaption>Figure 2 &mdash; Email verification. Enter the six digits, then press Verify Email.</figcaption>
+</figure>
+
+<ul>
+  <li>Type or paste the code into the six boxes. The cursor moves to the next box automatically as you type.</li>
+  <li>Press <strong>Verify Email</strong>. A success message appears and you are returned to the sign-in page.</li>
+  <li>No code? Check the spam/junk folder, then press <strong>Resend Code</strong> for a fresh one.</li>
+</ul>
+
+<div class="danger">
+  <b>Messages you may see</b>
+  <ul>
+    <li><em>&ldquo;Please enter all 6 digits!&rdquo;</em> &mdash; the boxes are not all filled in.</li>
+    <li><em>&ldquo;Invalid OTP. Please try again!&rdquo;</em> &mdash; the code is wrong or has expired. Resend it.</li>
+    <li><em>&ldquo;A new verification code has been sent to your email.&rdquo;</em> &mdash; resend worked; check the newest email.</li>
+  </ul>
+</div>
+
+<div class="tip">
+  <b>Tip</b>
+  <p>Always use the most recent code. When you press <em>Resend Code</em>, the older code stops working.</p>
+</div>
+
+<!-- ================= STEP 3 ================= -->
+<div class="step-title"><span class="step-num">3</span> Sign In to Your Account</div>
+
+<p>Now sign in with the email and password you just created. Technician accounts land directly on the
+<strong>Technician Dashboard</strong>. The left sidebar becomes your main navigation and shows your
+current approval status at the top.</p>
+
+<figure>
+  <img src="User Guide Images/Login Page.png" alt="Login page" />
+  <figcaption>Figure 3 &mdash; The technician sign-in page.</figcaption>
+</figure>
+
+<div class="cards">
+  <div class="card">
+    <div class="ch">Sidebar Navigation</div>
+    <ul>
+      <li><strong>Dashboard</strong> &mdash; your overview and statistics</li>
+      <li><strong>Service Request</strong> &mdash; requests matched to your expertise</li>
+      <li><strong>My Profile</strong> &mdash; the technical profile form</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="ch">Status Badge</div>
+    <ul>
+      <li><span class="pill p-approved">APPROVED</span> green &mdash; you are live</li>
+      <li><span class="pill p-pending">NOT APPROVED</span> red &mdash; profile not yet approved</li>
+      <li>Amber &mdash; <strong>Awaiting Supervisor Confirmation</strong></li>
+    </ul>
+  </div>
+</div>
+
+<div class="warn">
+  <b>Forgotten password?</b>
+  <p>On the login screen choose <strong>Forgot Password</strong>, enter your email address, and the system
+  sends a reset link. Follow the link to set a new password, then sign in again. The same screens are
+  used for the initial password set-up if you are redirected there.</p>
+</div>
+
+<!-- ================= STEP 4 ================= -->
+<div class="step-title"><span class="step-num">4</span> Complete the Technical Profile</div>
+
+<p>From the sidebar choose <strong>My Profile</strong>. This is a single long form titled
+<strong>&ldquo;Technician Profile&rdquo;</strong> containing seven sections, with a single
+<strong>Submit Profile</strong> button at the very bottom. Every section validates independently, so you
+can work through them in any order &mdash; but all of them must pass before anything is saved.</p>
+
+<div class="box danger">
+  <b>How the form reports problems</b>
+  <p>When you press <strong>Submit Profile</strong> with something missing, a red summary box appears at
+  the top of the page listing the offending sections. Each section name is a link &mdash; click it to
+  jump straight there. Any section with a problem also gets a red <strong>&ldquo;Needs attention&rdquo;</strong>
+  badge in its header. Nothing is saved until every section is valid, so fix the list and press
+  <strong>Submit Profile</strong> again.</p>
+</div>
+
+<figure>
+  <img src="User Guide Images/screencapture-localhost-5173-tech-profile-2025-12-05-14_16_51.png" alt="Technician profile page" />
+  <figcaption>Figure 4 &mdash; The Technician Profile page. Scroll through all seven sections, then use Submit Profile at the bottom.</figcaption>
+</figure>
+
+<h3>4.1 &nbsp;Personal Information <span class="req">(required)</span></h3>
+
+<table>
+  <thead><tr><th style="width:30%">Field</th><th style="width:16%">Required</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Profile image</td><td><span class="opt">Optional</span></td><td><strong>Choose File</strong> button; any image format.</td></tr>
+    <tr><td>Title <span class="req">*</span></td><td><span class="req">Required</span></td><td>Mr / Mrs / Miss.</td></tr>
+    <tr><td>Name with Initials <span class="req">*</span></td><td><span class="req">Required</span></td><td>Format <code>N.M.Perera</code>.</td></tr>
+    <tr><td>Full Name</td><td><span class="opt">Auto</span></td><td>Filled in from your registration and locked &mdash; not editable.</td></tr>
+    <tr><td>NIC Number <span class="req">*</span></td><td><span class="req">Required</span></td><td>9 digits followed by V or X (e.g. <code>199012345678</code> style is also accepted as 12 digits).</td></tr>
+    <tr><td>Gender <span class="req">*</span></td><td><span class="req">Required</span></td><td>Male / Female.</td></tr>
+    <tr><td>Address <span class="req">*</span></td><td><span class="req">Required</span></td><td>Your residential address.</td></tr>
+    <tr><td>District <span class="req">*</span></td><td><span class="req">Required</span></td><td>One of the 25 Sri Lankan districts (Colombo, Gampaha, Kandy, Galle, Jaffna, Matara, &hellip;).</td></tr>
+    <tr><td>Mobile Phone <span class="req">*</span></td><td><span class="req">Required</span></td><td>10 digits starting with <code>0</code>, e.g. <code>0771234567</code>.</td></tr>
+    <tr><td>Land Line Phone</td><td><span class="opt">Optional</span></td><td>Office number, if you have one.</td></tr>
+    <tr><td>Email</td><td><span class="opt">Auto</span></td><td>Taken from your verified registration and locked.</td></tr>
+  </tbody>
+</table>
+
+<h4>Institute Details</h4>
+<p>Answer <strong>&ldquo;Do you belong to an institute?&rdquo;</strong> &mdash; Yes or No.</p>
+<table>
+  <thead><tr><th style="width:30%">Field</th><th style="width:16%">Required</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Institute Name <span class="req">*</span></td><td><span class="req">If Yes</span></td><td>Start typing &mdash; a suggestion list appears. You must <strong>click one of the suggestions</strong>; typing a name by hand is rejected with &ldquo;Please select an institute from the suggestions&rdquo;.</td></tr>
+    <tr><td>Designation <span class="req">*</span></td><td><span class="req">If Yes</span></td><td>Your job title at that institute.</td></tr>
+  </tbody>
+</table>
+
+<div class="tip">
+  <b>Choosing &ldquo;No&rdquo; clears the section</b>
+  <p>Switching <em>Do you belong to an institute?</em> to <strong>No</strong> automatically clears the
+  institute, designation and all supervisor fields, and removes the supervisor consent requirement.
+  Set this before you save if you are an independent technician.</p>
+</div>
+
+<h4>Supervisor Details</h4>
+<p>Only shown when you answered <strong>Yes</strong> to the institute question. Then answer
+<strong>&ldquo;Do you have a supervisor?&rdquo;</strong></p>
+<table>
+  <thead><tr><th style="width:30%">Field</th><th style="width:16%">Required</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Supervisor Name <span class="req">*</span></td><td><span class="req">If Yes</span></td><td>Full name of your supervisor.</td></tr>
+    <tr><td>Supervisor Designation <span class="req">*</span></td><td><span class="req">If Yes</span></td><td>Their job title.</td></tr>
+    <tr><td>Supervisor Email <span class="req">*</span></td><td><span class="req">If Yes</span></td><td>Must be a valid address &mdash; the consent invitation is sent here.</td></tr>
+    <tr><td>Supervisor Contact Number <span class="req">*</span></td><td><span class="req">If Yes</span></td><td>10 digits starting with <code>0</code>.</td></tr>
+  </tbody>
+</table>
+
+<p>When you submit, the system emails the supervisor an invitation automatically. An amber panel
+appears saying the invitation has been sent, with the recipient address and <strong>Status: Pending</strong>,
+plus a <strong>Resend Invitation</strong> button. Once they consent, the panel turns green and reads
+<em>&ldquo;Your supervisor has confirmed and provided consent.&rdquo;</em></p>
+
+<h3>4.2 &nbsp;Technical Expertise <span class="req">(required &mdash; at least one entry)</span></h3>
+
+<p>This is the section that decides which service requests you are matched to. It is made of five
+sub-lists. Each dropdown is searchable, and each has an <strong>Other</strong> choice that reveals a text
+box so you can type a value that is not in the system list.</p>
+
+<table>
+  <thead><tr><th style="width:32%">Sub-list</th><th>How to fill it</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Laboratory Categories</strong></td>
+      <td>Use <em>Add Laboratory Category</em> to add a row, then pick from the searchable dropdown (or choose Other and type your own). Use <em>Remove</em> to delete a row. Saved values display as orange tags.</td>
+    </tr>
+    <tr>
+      <td><strong>Instrument Categories</strong></td>
+      <td>Same pattern &mdash; <em>Add Instrument Category</em>, searchable dropdown, optional custom entry, <em>Remove</em> per row.</td>
+    </tr>
+    <tr>
+      <td><strong>Instruments</strong></td>
+      <td>The specific instruments you service. The list is very large, so use the search box inside the dropdown. Added one row at a time.</td>
+    </tr>
+    <tr>
+      <td><strong>Instrument Care Categories</strong></td>
+      <td>The type of care you provide (for example calibration, preventive maintenance, installation). Added with <em>Add Instrument Care Category</em>.</td>
+    </tr>
+    <tr>
+      <td><strong>Manual / Unlisted Instruments</strong></td>
+      <td>For instruments that are not in the system at all. Type the name (e.g. <code>Custom Centrifuge Model X</code>) and press <strong>Add Manual Override</strong>. Each one appears as a removable blue tag.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <b>Be specific &mdash; it pays off</b>
+  <p>The more accurate these lists are, the better the service requests you are matched to. Add every
+  category and instrument you genuinely work on. If you edit a saved entry and leave the editor open,
+  the form will refuse to submit until you press <strong>Save</strong> or <strong>Cancel</strong>.</p>
+</div>
+
+<h3>4.3 &nbsp;Areas of Technical Expertise <span class="req">(required)</span></h3>
+
+<p>Two checkbox groups. You must select <strong>at least one option in each</strong>.</p>
+
+<table>
+  <thead><tr><th style="width:32%">Group</th><th>Options</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Service Coverage</strong><br/><span class="opt">&ldquo;Please indicate the region(s) you provide service coverage for&rdquo;</span></td>
+      <td>Island-wide &middot; Western &middot; Central &middot; Southern &middot; Northern &middot; Eastern &middot; North Western &middot; North Central &middot; Uva &middot; Sabaragamuwa &middot; Other (Specify)</td>
+    </tr>
+    <tr>
+      <td><strong>Availability</strong><br/><span class="opt">&ldquo;Please indicate your availability&rdquo;</span></td>
+      <td>Full-time Technical Service Provider &middot; Part-time Technical Service Provider &middot; Contractual Basis &middot; Consultancy Basis &middot; Emergency Support Available &middot; Other (Specify)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>If you tick <strong>Other (Specify)</strong>, a text box appears and you must type what it means
+&mdash; otherwise the section will report &ldquo;please specify the &lsquo;Other&rsquo; value&rdquo;.</p>
+
+<h3>4.4 &nbsp;Current / Past Employment <span class="req">(required &mdash; at least one entry)</span></h3>
+
+<table>
+  <thead><tr><th style="width:32%">Field</th><th>Required</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Organization <span class="req">*</span></td><td><span class="req">Required</span></td><td>Employer or institution name.</td></tr>
+    <tr><td>Position / Role <span class="req">*</span></td><td><span class="req">Required</span></td><td>Your job title.</td></tr>
+    <tr><td>Start Date <span class="req">*</span></td><td><span class="req">Required</span></td><td>Pick from the date picker.</td></tr>
+    <tr><td>End Date</td><td><span class="opt">Optional</span></td><td>Leave blank if this is your current job. The system then counts the role as ongoing.</td></tr>
+  </tbody>
+</table>
+
+<p>Entries can be edited inline and removed with <strong>Remove</strong>; a removed entry can be
+<strong>restored</strong> until you press <strong>Submit Profile</strong>. An incomplete row that you
+have not filled in or removed will block the whole submission.</p>
+
+<h3>4.5 &nbsp;Certificates <span class="req">(required &mdash; at least one entry)</span></h3>
+
+<table>
+  <thead><tr><th style="width:32%">Field</th><th>Required</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>OEM Company Name</td><td><span class="opt">Optional</span></td><td>The manufacturer that issued the certificate.</td></tr>
+    <tr><td>Instrument Name</td><td><span class="opt">Optional</span></td><td>Instrument the certificate covers.</td></tr>
+    <tr><td>Certificate Name <span class="req">*</span></td><td><span class="req">Required</span></td><td>Type of certificate.</td></tr>
+    <tr><td>Certificate Number <span class="req">*</span></td><td><span class="req">Required</span></td><td>Must be filled in for the entry to be accepted.</td></tr>
+    <tr><td>Issue Date</td><td><span class="opt">Optional</span></td><td>Date picker.</td></tr>
+    <tr><td>Expiry Date</td><td><span class="opt">Optional</span></td><td>Date picker.</td></tr>
+    <tr><td>Certificate File</td><td><span class="opt">Optional</span></td><td>Upload the scan. Existing files are shown as a <em>View Certificate</em> link and can be replaced with a new file.</td></tr>
+  </tbody>
+</table>
+
+<p>Every row must have at least a Certificate Name and Certificate Number. Incomplete rows are flagged
+and stop the submission until they are finished or removed.</p>
+
+<h3>4.6 &nbsp;Related Work Experience <span class="opt">(optional &mdash; if any)</span></h3>
+
+<p>Reference jobs you have already done. Leaving this section empty does not block approval, but a filled
+section strengthens the profile considerably.</p>
+
+<table>
+  <thead><tr><th style="width:32%">Field</th><th>Required</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Service Type <span class="req">*</span></td><td><span class="req">If you add an entry</span></td>
+      <td>Instrument Installation &middot; Preventive Maintenance &middot; Corrective Maintenance &middot; Repair and Servicing &middot; Calibration &middot; Performance Verification &middot; Troubleshooting &middot; User Training &middot; Other (Specify)</td></tr>
+    <tr><td>Client Name <span class="req">*</span></td><td><span class="req">Required</span></td><td>Who the work was done for.</td></tr>
+    <tr><td>Client Email <span class="req">*</span></td><td><span class="req">Required</span></td><td>Must be a valid email address.</td></tr>
+    <tr><td>Contact Number <span class="req">*</span></td><td><span class="req">Required</span></td><td>10 digits starting with <code>0</code>.</td></tr>
+    <tr><td>Service Completion Date <span class="req">*</span></td><td><span class="req">Required</span></td><td>Year and Month picker.</td></tr>
+  </tbody>
+</table>
+
+<h3>4.7 &nbsp;Terms and Conditions <span class="req">(all four required)</span></h3>
+
+<p>Four checkboxes at the bottom of the form. <strong>All four must be ticked</strong> &mdash; the
+submission will report how many are still outstanding. Read them before accepting, because they are a
+binding commitment:</p>
+
+<table>
+  <thead><tr><th style="width:8%">#</th><th>Term</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>I agree to service laboratory instruments only in accordance with the manufacturer specifications and the accepted safety standards.</td></tr>
+    <tr><td>2</td><td>I consent to maintaining a complete record of all maintenance, repair and calibration work carried out for audit purposes.</td></tr>
+    <tr><td>3</td><td>I agree to handle client and instrument data strictly and confidentially, and use it only for the intended service.</td></tr>
+    <tr><td>4</td><td>I confirm that all services are performed by qualified personnel and that any replacement parts used meet the required standards.</td></tr>
+  </tbody>
+</table>
+
+<div class="warn">
+  <b>This is the step that triggers review</b>
+  <p>Accepting all four terms automatically changes your account status from <strong>Pending</strong> to
+  <strong>Submitted</strong> and places you in the administrator's review queue. Until you do this, no
+  one at NSF can see your profile for approval.</p>
+</div>
+
+<h4>Submitting the profile</h4>
+<p>Scroll to the bottom and press <strong>Submit Profile</strong> (it shows <em>Saving&hellip;</em> while
+working). If everything is complete you will see <strong>&ldquo;Profile saved successfully!&rdquo;</strong>
+and the page refreshes with your saved data. If something failed to save, the system names the sections
+that failed so you can retry just those.</p>
+
+<!-- ================= STEP 5 ================= -->
+<div class="step-title"><span class="step-num">5</span> Supervisor Confirmation</div>
+
+<div class="box note">
+  <b>Only applies if you declared a supervisor</b>
+  <p>If you answered <strong>No</strong> to both &ldquo;Do you belong to an institute?&rdquo; and
+  &ldquo;Do you have a supervisor?&rdquo;, skip this section entirely and go straight to Step 6.</p>
+</div>
+
+<h3>What happens when you submit</h3>
+<ol>
+  <li>The system emails a consent link to the supervisor address you entered, and the link is valid for <strong>7 days</strong>.</li>
+  <li>Your sidebar badge changes to amber: <strong>Awaiting Supervisor Confirmation</strong>.</li>
+  <li>In <em>My Profile &rarr; Personal Information</em>, an amber panel shows the invited address, <strong>Status: Pending</strong>, and a <strong>Resend Invitation</strong> button.</li>
+  <li>As soon as the supervisor consents, the panel turns green and the badge clears.</li>
+</ol>
+
+<h3>What the supervisor does</h3>
+<p>They open the emailed link, which shows a consent form. They:</p>
+<ul>
+  <li>confirm the technician details shown to them,</li>
+  <li>tick the box confirming they personally know the technician,</li>
+  <li>state how long they have known them &mdash; <em>Less than 1 year, 1&ndash;3 years, 3&ndash;5 years, More than 5 years</em>,</li>
+  <li>add any comments,</li>
+  <li><strong>sign</strong> &mdash; either draw a signature on the signature pad or switch to typing their name,</li>
+  <li>press <strong>Consent</strong> or <strong>Decline</strong>.</li>
+</ul>
+
+<div class="danger">
+  <b>Common supervisor-side problems</b>
+  <ul>
+    <li><em>&ldquo;A signature is required. Please sign using the signature pad or type your name.&rdquo;</em> &mdash; the signature is mandatory before the form will submit.</li>
+    <li><em>&ldquo;This invite link has expired. Ask the technician to send a new invite.&rdquo;</em> &mdash; press <strong>Resend Invitation</strong> in your profile.</li>
+    <li><em>&ldquo;This invite link is not valid.&rdquo;</em> &mdash; the link was truncated by the mail client. Ask for a resend and open the full link from the newest email.</li>
+  </ul>
+</div>
+
+<div class="warn">
+  <b>Reminder</b>
+  <p>Your profile can be <em>submitted</em> while waiting, but it cannot be <em>approved</em> until the
+  supervisor's consent has been recorded. Chase your supervisor if the amber badge is still showing
+  after a day.</p>
+</div>
+
+<!-- ================= STEP 6 ================= -->
+<div class="step-title"><span class="step-num">6</span> Get Approved</div>
+
+<p>Approval is a two-gate process. Both gates must pass, in this order.</p>
+
+<figure>
+  <img src="User Guide Images/screencapture-localhost-5173-tech-dashboard-2025-12-11-10_52_36.png" alt="Technician dashboard" />
+  <figcaption>Figure 5 &mdash; The Technician Dashboard. The status badge at the top of the sidebar is your quickest progress check.</figcaption>
+</figure>
+
+<div class="flow">
+  <div class="flow-box"><span class="t">Gate 1</span><span class="d">Profile submitted<br/>(4 terms accepted)</span></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box"><span class="t">Gate 2</span><span class="d">Supervisor consent<br/>(if declared)</span></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box"><span class="t">Admin Review</span><span class="d">Approve / Decline</span></div>
+</div>
+
+<h3>Gate 1 &mdash; Profile must be Submitted</h3>
+<p>All four Terms and Conditions accepted. Status changes from <span class="pill p-pending">PENDING</span>
+to <span class="pill p-submitted">SUBMITTED</span>. Until this happens the administrator cannot act.</p>
+
+<h3>Gate 2 &mdash; Supervisor consent (conditional)</h3>
+<p>If a supervisor was declared, their consent must be recorded first. The system blocks the final
+decision with the message <em>&ldquo;Cannot set final status before the supervisor gives their consent.&rdquo;</em>
+Until then the administrator simply has no Approve or Decline buttons available on your row.</p>
+
+<h3>What the administrator does</h3>
+<ol>
+  <li>Opens the admin <strong>Technicians</strong> list and filters by status <strong>Submitted</strong> (or searches your name / reference number).</li>
+  <li>Opens your full profile to review your personal information, institute and supervisor details, technical expertise, areas of expertise, employment history, certificates, related work and terms.</li>
+  <li>Checks the supervisor column if a supervisor was declared &mdash; it shows the consent status.</li>
+  <li>Clicks the green <strong>Approve</strong> tick or the red <strong>Decline</strong> cross next to your status.</li>
+</ol>
+
+<h3>What you see afterwards</h3>
+<table>
+  <thead><tr><th style="width:22%">Outcome</th><th style="width:26%">Sidebar badge</th><th>What to do next</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="pill p-approved">APPROVED</span></td>
+      <td>Green &mdash; <strong>Approved</strong></td>
+      <td>Nothing further. You can now accept and decline service requests, and your profile becomes visible in technician searches.</td>
+    </tr>
+    <tr>
+      <td><span class="pill p-declined">DECLINED</span></td>
+      <td>Red &mdash; <strong>Not Approved</strong></td>
+      <td>Review your profile for anything incomplete or unclear, correct it, and re-submit. If you are unsure why, contact the System Administrator &mdash; do not create a second account.</td>
+    </tr>
+    <tr>
+      <td><span class="pill p-submitted">SUBMITTED</span></td>
+      <td>Red &mdash; <strong>Not Approved</strong></td>
+      <td>You are in the queue. Wait for the administrator. If you declared a supervisor, check that the consent has landed.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<!-- ================= STEP 7 ================= -->
+<div class="step-title"><span class="step-num">7</span> Start Working on Requests</div>
+
+<p>Once the badge turns green, the system starts matching service requests to you based on the technical
+expertise, service coverage and availability you declared in your profile. Use the sidebar to navigate.</p>
+
+<h3>Dashboard</h3>
+<p>Your overview: summary statistics for your activity, the service requests assigned or matched to you,
+and a job summary of completed work.</p>
+
+<h3>Service Request</h3>
+<p>The list of service requests you can act on. Open a request to see the full details, then choose to
+respond.</p>
+
+<table>
+  <thead><tr><th style="width:22%">Action</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Accept</strong></td>
+      <td>Opens a response form. Fill in the <strong>Client Email Address</strong>, a <strong>Subject</strong> and a <strong>Message</strong>, then press <strong>Send Acceptance</strong>. The owner is notified by email immediately. Press <strong>Back</strong> to return to the list without sending.</td>
+    </tr>
+    <tr>
+      <td><strong>Decline</strong></td>
+      <td>Opens a similar form where you give a reason for declining. The response is recorded and the owner is notified.</td>
+    </tr>
+    <tr>
+      <td><strong>View</strong></td>
+      <td>Opens the request details panel so you can read the full job description before deciding.</td>
+    </tr>
+  </tbody>
+</table>
+
+<figure class="half">
+  <img src="User Guide Images/screencapture-localhost-5173-tech-accept-service-request-2025-12-11-10_54_08.png" alt="Accept a service request" />
+  <figcaption>Figure 6 &mdash; Responding to a service request. Fill in the client email, subject and message, then send.</figcaption>
+</figure>
+
+<div class="tip">
+  <b>Professional reminder</b>
+  <p>You accepted a term to maintain a complete record of all maintenance, repair and calibration work
+  for audit purposes. Keep the profile and job records accurate &mdash; they are the audit trail.</p>
+</div>
+
+<p>Two further pages keep a full history: <strong>All Service Request</strong> (every request, searchable
+by reference, client or instrument) and <strong>All Job Summary</strong> (your job records, also
+searchable). Use them to check on the status of anything you have already responded to.</p>
+
+<div class="cards">
+  <div class="card">
+    <div class="ch">All Service Request</div>
+    <ul>
+      <li>Complete list of requests</li>
+      <li>Search by reference ID, client name or instrument</li>
+      <li>Filter by date range</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="ch">All Job Summary</div>
+    <ul>
+      <li>Your job records</li>
+      <li>Searchable record list</li>
+      <li>Use for reference and audit purposes</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="ch">Keeping Your Profile Current</div>
+    <ul>
+      <li>Add new certificates as you earn them</li>
+      <li>Update employment when you move roles</li>
+      <li>Re-accept terms if they are revised</li>
+      <li>Keep expiry dates accurate</li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ================= TROUBLESHOOTING ================= -->
+<div class="step-title"><span class="step-num">!</span> Troubleshooting &amp; Common Errors</div>
+
+<table>
+  <thead><tr><th style="width:38%">Message or symptom</th><th>What it means / how to fix it</th></tr></thead>
+  <tbody>
+    <tr><td><em>&ldquo;Please complete all required fields (see highlighted sections) before submitting.&rdquo;</em></td><td>A required field in Personal Information is empty. Check the red <em>Needs attention</em> badges.</td></tr>
+    <tr><td><em>&ldquo;Please select an institute from the suggestions&rdquo;</em></td><td>You typed the institute name but did not click it in the suggestion list. The name must match a record in the system.</td></tr>
+    <tr><td><em>&ldquo;Enter a valid NIC (9 digits + V/X or 12 digits)&rdquo;</em></td><td>Check the NIC format &mdash; either 9 digits then V or X, or 12 digits.</td></tr>
+    <tr><td><em>&ldquo;Mobile number must be 10 digits starting with 0&rdquo;</em></td><td>Use the local format <code>0771234567</code> &mdash; no spaces, no plus sign, no country code.</td></tr>
+    <tr><td><em>&ldquo;Add at least one technical expertise entry.&rdquo;</em></td><td>Add at least one laboratory category, instrument category, instrument or care category.</td></tr>
+    <tr><td><em>&ldquo;Add at least one certificate.&rdquo;</em></td><td>Add at least one certificate with a name and number.</td></tr>
+    <tr><td><em>&ldquo;Add at least one current/past employment entry.&rdquo;</em></td><td>Add at least one employment entry with organization, position and start date.</td></tr>
+    <tr><td><em>&ldquo;Please accept all 4 terms&rdquo;</em></td><td>Tick all four Terms and Conditions checkboxes. This is what moves you to Submitted.</td></tr>
+    <tr><td><em>&ldquo;Save or cancel the current edit before submitting.&rdquo;</em></td><td>You left a row open in the editor. Press Save or Cancel on that row first.</td></tr>
+    <tr><td><em>&ldquo;The form has missing or invalid fields. Please fix the highlighted sections.&rdquo;</em></td><td>The red summary box lists exactly which sections are blocked &mdash; click a section name to jump to it.</td></tr>
+    <tr><td>Sidebar stuck on <strong>Awaiting Supervisor Confirmation</strong></td><td>Your supervisor has not opened the consent link yet. Use <strong>Resend Invitation</strong>, and check that you entered their current email address.</td></tr>
+    <tr><td>Status still <strong>Not Approved</strong> after submitting</td><td>You are in the review queue. If a supervisor was declared, consent is the usual blocker. Otherwise contact the System Administrator.</td></tr>
+    <tr><td>Profile marked <strong>Declined</strong></td><td>Correct the problem in <em>My Profile</em> and re-submit. Do not register a new account.</td></tr>
+    <tr><td><em>&ldquo;Email could not be sent. Please contact support.&rdquo;</em></td><td>The supervisor invitation email bounced. Verify the address and resend, or contact the administrator.</td></tr>
+  </tbody>
+</table>
+
+<div class="box danger">
+  <b>Contact System Administrator</b>
+  <p>Phone: <strong>+94 (0)11 2 696771</strong> &nbsp;&middot;&nbsp; Extension: <strong>191, 126</strong><br/>
+  Email: <strong>nid@nsf.gov.lk</strong></p>
+</div>
+
+<!-- ================= CHECKLIST ================= -->
+<div class="step-title"><span class="step-num">&#10003;</span> One-Page Final Checklist</div>
+
+<p>Print this page or keep it open while you work through the profile.</p>
+
+<h3>Account</h3>
+<ul class="checklist">
+  <li>Registered using the Technician Registration form (not the general user form)</li>
+  <li>Verified the 6-digit OTP sent to my email address</li>
+  <li>Signed in successfully and reached the Technician Dashboard</li>
+</ul>
+
+<h3>Personal Information</h3>
+<ul class="checklist">
+  <li>Title, Name with Initials, NIC, Gender, Address and District completed</li>
+  <li>Mobile number is 10 digits starting with 0</li>
+  <li>Institute question answered &mdash; institute selected from the suggestion list and designation filled in</li>
+  <li>Supervisor question answered &mdash; if Yes, all four supervisor fields completed</li>
+  <li>Supervisor consent link opened and consent recorded (badge is green, not amber)</li>
+</ul>
+
+<h3>Technical Profile</h3>
+<ul class="checklist">
+  <li>Technical Expertise &mdash; laboratory categories, instrument categories, instruments and care categories added; any unlisted instruments added as manual overrides</li>
+  <li>Areas of Technical Expertise &mdash; at least one service coverage and at least one availability option</li>
+  <li>Current / Past Employment &mdash; at least one entry with organization, position and start date</li>
+  <li>Certificates &mdash; at least one entry with certificate name and number, file scanned where possible</li>
+  <li>Related Work Experience &mdash; completed if applicable (optional)</li>
+  <li>All four Terms and Conditions accepted</li>
+  <li><strong>Submit Profile</strong> pressed and &ldquo;Profile saved successfully!&rdquo; seen</li>
+</ul>
+
+<h3>Approval &amp; Go Live</h3>
+<ul class="checklist">
+  <li>Status has moved from Pending to Submitted</li>
+  <li>Administrator has reviewed the profile</li>
+  <li>Sidebar badge shows green <strong>Approved</strong></li>
+  <li>Service requests can now be accepted and declined</li>
+</ul>
+
+<footer>
+  <span>Technician Quick Guide &mdash; National Instrument Database, NSF Sri Lanka</span>
+  <span>Internal use</span>
+</footer>
+
+</body>
+</html>

@@ -1,64 +1,127 @@
 import { useEffect, useState } from "react";
+import { SearchX } from "lucide-react";
 import { API_BASE } from "../../config";
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts";
+import { ChartEmptyState, ChartSkeleton } from "./ChartStates";
 
 export default function SearchTrendsChart() {
     const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(
-            `${API_BASE}/admin/view-search-count-hourly`,
-            {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-                },
-            }
-        )
+        let active = true;
+
+        fetch(`${API_BASE}/admin/view-search-count-hourly`, {
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            },
+        })
             .then((res) => res.json())
-            .then((res) => setData(res))
-            .catch((err) => console.error(err));
+            .then((res) => {
+                if (active) setData(Array.isArray(res) ? res : []);
+            })
+            .catch((err) => console.error(err))
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
     }, []);
 
-    const maxCount = Math.max(...data.map((d) => d.count), 1);
+    // count comes back from MySQL COUNT(*) as a string, so coerce it before
+    // it reaches the value axis.
+    const chartData = data.map((row) => ({
+        ...row,
+        count: Number(row.count) || 0,
+    }));
+
+    // Rows that all sit at zero would still draw an empty grid, so treat
+    // that the same as no rows at all.
+    const hasData = chartData.some((row) => row.count > 0);
 
     return (
-        <div className="rounded-[1.5rem] border border-orange-100 bg-white p-4 md:p-5">
+        <div className="rounded-[1.5rem] border border-gray-200 bg-white p-4 md:p-5">
             <div className="mb-5 flex items-center justify-between">
                 <h3 className="text-lg font-bold text-gray-900">
                     Search Trends (Hourly)
                 </h3>
-                <span className="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-orange-600">
+                <span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-600">
                     Live
                 </span>
             </div>
 
-            <div className="flex h-64 items-end gap-3 overflow-x-auto pb-2">
-                {data.map((item, index) => {
-                    const heightPercent = (item.count / maxCount) * 100;
-
-                    return (
-                        <div
-                            key={index}
-                            className="flex min-w-[40px] flex-col items-center justify-end"
+            {loading ? (
+                <ChartSkeleton height="h-64" />
+            ) : !hasData ? (
+                <ChartEmptyState
+                    icon={SearchX}
+                    title="No searches recorded yet"
+                    message="Technician search activity will appear here hour by hour. Nothing has been logged so far."
+                />
+            ) : (
+                <div className="h-64 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                            data={chartData}
+                            margin={{ top: 8, right: 8, bottom: 4, left: -20 }}
                         >
-                            <span className="mb-1 text-[10px] font-medium text-gray-600">
-                                {item.count}
-                            </span>
-
-                            <div className="flex h-48 w-6 items-end overflow-hidden rounded-xl bg-orange-100">
-                                <div
-                                    className="w-full rounded-xl bg-orange-500 transition-all duration-500"
-                                    style={{ height: `${heightPercent}%` }}
-                                    title={`${item.search_term}`}
-                                ></div>
-                            </div>
-
-                            <span className="mt-2 text-[10px] text-gray-500">
-                                {item.hour || item.search_term?.slice(0, 6)}
-                            </span>
-                        </div>
-                    );
-                })}
-            </div>
+                            <defs>
+                                <linearGradient
+                                    id="searchTrendBar"
+                                    x1="0"
+                                    y1="0"
+                                    x2="0"
+                                    y2="1"
+                                >
+                                    <stop offset="0%" stopColor="#fb923c" />
+                                    <stop offset="100%" stopColor="#ea580c" />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid
+                                stroke="#f3f4f6"
+                                strokeDasharray="5 5"
+                                vertical={false}
+                            />
+                            <XAxis
+                                dataKey="hour"
+                                tick={{ fontSize: 11 }}
+                                stroke="#9ca3af"
+                                interval="preserveStartEnd"
+                            />
+                            <YAxis
+                                allowDecimals={false}
+                                tick={{ fontSize: 11 }}
+                                stroke="#9ca3af"
+                            />
+                            <Tooltip
+                                cursor={{ fill: "#fff7ed" }}
+                                contentStyle={{
+                                    backgroundColor: "#ffffff",
+                                    border: "1px solid #e5e7eb",
+                                    borderRadius: "12px",
+                                    fontSize: "12px",
+                                }}
+                            />
+                            <Bar
+                                dataKey="count"
+                                fill="url(#searchTrendBar)"
+                                radius={[8, 8, 0, 0]}
+                                maxBarSize={28}
+                            />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
         </div>
     );
 }

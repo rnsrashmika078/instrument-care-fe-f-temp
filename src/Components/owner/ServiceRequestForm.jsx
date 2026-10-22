@@ -11,6 +11,35 @@ export default function ServiceRequestForm({
   const token = sessionStorage.getItem("token");
   const [instruments, setInstruments] = useState([]);
   const userId = sessionStorage.getItem("user_id");
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
+
+  useEffect(() => {
+    const checkOwnProfile = async () => {
+      if (!technicianId || !token) return;
+      try {
+        const res = await fetch(`${API_BASE}/user/dashboard/${technicianId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (
+            data.technician_user_id &&
+            Number(data.technician_user_id) === Number(userId)
+          ) {
+            setIsOwnProfile(true);
+          }
+        }
+      } catch (err) {
+        console.error("Error checking technician profile:", err);
+      }
+    };
+
+    checkOwnProfile();
+  }, [technicianId, token, userId]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -96,6 +125,11 @@ export default function ServiceRequestForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isOwnProfile) {
+      toast.error("You cannot request service from yourself.");
+      return;
+    }
+
     if (!validateForm()) {
       toast.warn("Please fill out all required fields before submitting.");
       return;
@@ -132,7 +166,7 @@ export default function ServiceRequestForm({
       const data = await response.json();
       onSend(data); //  callback with response
       toast.success("Service request sent successfully!");
-    } catch (error) {
+    } catch {
       toast.success("Service Request sent successfully!");
     } finally {
       setLoading(false);
@@ -166,7 +200,12 @@ export default function ServiceRequestForm({
   }, [technicianId]);
 
   return (
-    <div className="w-full mx-auto bg-[#ffffff70] p-6 rounded-md shadow">
+      <div className="w-full bg-white rounded-xl shadow-sm p-4 md:p-6 border-2 border-gray-200">
+      {isOwnProfile && (
+        <div className="mb-4 rounded-lg border border-gray-300 bg-amber-50 p-3 text-sm text-amber-800">
+          You cannot request service from your own technician profile.
+        </div>
+      )}
       <form className="space-y-6" onSubmit={handleSubmit}>
         {/* ----------------- Personal Details Section ----------------- */}
         <div>
@@ -187,14 +226,16 @@ export default function ServiceRequestForm({
               },
             ].map((field) => (
               <div key={field.name}>
-                <label className="block font-semibold mb-1">
+                <label className="field-label">
                   {field.label} <span className="text-red-500"></span>
                 </label>
                 <input
                   type={field.name === "email" ? "email" : "text"}
                   name={field.name}
                   placeholder={field.placeholder}
-                  className="w-full border rounded px-3 py-1"
+                  className={
+                    field.name === "contact_number" ? "input phone-prefix" : "input"
+                  }
                   value={formData[field.name]}
                   onChange={handleChange}
                   required
@@ -223,14 +264,14 @@ export default function ServiceRequestForm({
               },
             ].map((field) => (
               <div key={field.name}>
-                <label className="block font-semibold mb-1">
+                <label className="field-label">
                   {field.label} <span className="text-red-500"></span>
                 </label>
                 <input
                   type="text"
                   name={field.name}
                   placeholder={field.placeholder}
-                  className="w-full border rounded px-3 py-1"
+                  className="input"
                   value={formData[field.name]}
                   onChange={handleChange}
                   required
@@ -289,14 +330,14 @@ export default function ServiceRequestForm({
               },
             ].map((field) => (
               <div key={field.name}>
-                <label className="block font-semibold mb-1">
+                <label className="field-label">
                   {field.label} <span className="text-red-500"></span>
                 </label>
                 {/* <input
                   type="text"
                   name={field.name}
                   placeholder={field.placeholder}
-                  className="w-full border rounded px-3 py-1"
+                  className="input"
                   value={formData[field.name]}
                   onChange={handleChange}
                   required
@@ -304,7 +345,7 @@ export default function ServiceRequestForm({
                 {field.name === "instrument_name" ? (
                   <select
                     name="instrument_name"
-                    className="w-full border rounded px-3 py-2"
+                    className="input"
                     value={formData.instrument_name}
                     onChange={handleChange}
                     required
@@ -325,7 +366,7 @@ export default function ServiceRequestForm({
                     type="text"
                     name={field.name}
                     placeholder={field.placeholder}
-                    className="w-full border rounded px-3 py-1"
+                    className="input"
                     value={formData[field.name]}
                     onChange={handleChange}
                     required
@@ -343,7 +384,7 @@ export default function ServiceRequestForm({
               rows="4"
               name="issue_description"
               placeholder="Ex: Need to repair the instrument"
-              className="w-full border rounded px-3 py-2"
+              className="input"
               value={formData.issue_description}
               onChange={handleChange}
               required
@@ -359,15 +400,15 @@ export default function ServiceRequestForm({
               toast.success("Form Cleared!");
               onBack();
             }}
-            className="w-full md:w-1/2 border rounded py-2 font-semibold hover:bg-gray-100 hover:cursor-pointer"
+            className="w-full md:w-1/2 rounded-lg border border-gray-300 bg-white py-2.5 font-semibold text-gray-700 transition hover:border-gray-400 hover:bg-orange-50 hover:text-orange-700 hover:cursor-pointer"
           >
             Clear Details
           </button>
 
           <button
             type="submit"
-            className="w-full md:w-1/2 bg-orange-400 text-white font-semibold py-2 rounded hover:bg-orange-500 transition flex items-center justify-center"
-            disabled={loading} //  disable button when loading
+            className="w-full md:w-1/2 bg-orange-500 text-white font-semibold py-2.5 rounded-lg shadow-sm transition hover:bg-orange-600 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading || isOwnProfile}
           >
             {loading ? (
               <>
@@ -393,6 +434,8 @@ export default function ServiceRequestForm({
                 </svg>
                 Sending...
               </>
+            ) : isOwnProfile ? (
+              "You Can't Request From Yourself"
             ) : (
               "Send a Service Request"
             )}

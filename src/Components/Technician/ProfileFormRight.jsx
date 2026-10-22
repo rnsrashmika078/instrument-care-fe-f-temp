@@ -11,7 +11,7 @@ export default function ProfileFormRight({ formData, handleChange }) {
           name="company_name"
           value={formData.company_name}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -22,7 +22,7 @@ export default function ProfileFormRight({ formData, handleChange }) {
           name="company_designation"
           value={formData.company_designation}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -33,7 +33,7 @@ export default function ProfileFormRight({ formData, handleChange }) {
           name="years_of_experience"
           value={formData.years_of_experience}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
         
       </label>
@@ -48,7 +48,7 @@ export default function ProfileFormRight({ formData, handleChange }) {
           name="certificate_name"
           value={formData.certificate_name}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -59,7 +59,7 @@ export default function ProfileFormRight({ formData, handleChange }) {
           name="certificate_issued_year"
           value={formData.certificate_issued_year}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -70,7 +70,7 @@ export default function ProfileFormRight({ formData, handleChange }) {
           name="certificate_verification_code"
           value={formData.certificate_verification_code}
           onChange={handleChange}
-          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-1 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -83,7 +83,7 @@ export default function ProfileFormRight({ formData, handleChange }) {
           name="guarantee_for_service"
           value={formData.guarantee_for_service}
           onChange={handleChange}
-          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
 
@@ -94,7 +94,7 @@ export default function ProfileFormRight({ formData, handleChange }) {
           name="additional_comment"
           value={formData.additional_comment}
           onChange={handleChange}
-          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+          className="border rounded p-2 w-full bg-gray-200 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
         />
       </label>
     </div>

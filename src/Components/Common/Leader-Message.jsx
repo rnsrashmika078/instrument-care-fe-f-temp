@@ -101,7 +101,7 @@ export default function LeaderMessage() {
           {cards.map((card, index) => (
             <div
               key={index}
-              className="min-w-[380px] max-w-[380px] min-h-[520px] bg-white shadow-sm rounded-lg p-4 flex-shrink-0 flex flex-col justify-between"
+              className="min-w-[380px] max-w-[380px] min-h-[520px] bg-white shadow-sm rounded-lg p-4 flex-shrink-0 flex flex-col justify-between border-2 border-gray-200"
             >
               <div>
                 <div className="w-full h-72 bg-gray-100 flex items-center justify-center mb-4">

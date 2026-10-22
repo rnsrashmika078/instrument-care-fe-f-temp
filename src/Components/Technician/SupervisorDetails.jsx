@@ -69,7 +69,7 @@ export default function SupervisorDetails() {
     };
 
     return (
-        <div className="bg-white shadow rounded-xl p-6 space-y-4">
+        <div className="bg-white shadow rounded-xl p-6 space-y-4 border-2 border-gray-200">
             <h3 className="font-semibold text-lg">Supervisor Details</h3>
 
             <input
@@ -77,7 +77,7 @@ export default function SupervisorDetails() {
                 value={supervisor.name}
                 onChange={handleChange}
                 placeholder="Supervisor Name"
-                className="border p-2 rounded w-full"
+                className="input"
             />
 
             <input
@@ -85,7 +85,7 @@ export default function SupervisorDetails() {
                 value={supervisor.designation}
                 onChange={handleChange}
                 placeholder="Designation"
-                className="border p-2 rounded w-full"
+                className="input"
             />
 
             <input
@@ -93,7 +93,7 @@ export default function SupervisorDetails() {
                 value={supervisor.email}
                 onChange={handleChange}
                 placeholder="Email"
-                className="border p-2 rounded w-full"
+                className="input"
             />
 
             <input
@@ -101,7 +101,7 @@ export default function SupervisorDetails() {
                 value={supervisor.contact}
                 onChange={handleChange}
                 placeholder="Contact Number"
-                className="border p-2 rounded w-full"
+                className="input phone-prefix"
             />
 
             <div className="flex justify-end">

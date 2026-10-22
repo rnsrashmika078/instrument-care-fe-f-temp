@@ -2,7 +2,7 @@ import React from "react";
 
 export default function ServiceRequestFail({ onBack = () => {} }) {
   return (
-    <div className="rounded-lg p-4 sm:p-6 w-full mx-auto shadow bg-[#ffffff80]">
+    <div className="w-full rounded-2xl border-2 border-gray-200 bg-white p-4 shadow-sm sm:p-6">
       {/* Title */}
       {/* <h3 className="font-bold text-lg">Accept Service Request</h3> */}
 

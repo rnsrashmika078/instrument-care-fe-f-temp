@@ -1,4 +1,5 @@
 import { fetchWithAuth } from '../../Components/utils/api';
+import { formatPhone } from '../../Components/utils/phone';
 import React, { useEffect, useState } from "react";
 import Navbar from "../../Components/Technician/Navbar";
 import Admin_Sidebar from "../../Components/admin/Sidebar";
@@ -32,7 +33,7 @@ export default function All_Users() {
           ...user, //  VERY IMPORTANT
 
           fullName: `${user.first_name} ${user.last_name}`,
-          contact: user.mobile_number,
+          contact: formatPhone(user.mobile_number),
           role: user.user_type_id === 1 ? "Admin" : "User",
           createdAt: user.created || "N/A",
           active: user.user_status === 1,
@@ -64,7 +65,7 @@ export default function All_Users() {
         <Admin_Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 bg-[#ffffff80] rounded-lg p-4">
+          <main className="flex-1 bg-[#ffffff80] rounded-lg p-4 pt-14 md:pt-4 border-2 border-gray-200">
           <h2 className="text-xl font-bold mb-4">All Users</h2>
 
           {/*  Loading State */}

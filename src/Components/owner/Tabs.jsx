@@ -1,7 +1,8 @@
 import React from "react";
-import { NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { ArrowLeft, CircleUser, Wrench, History } from "lucide-react";
 import { API_BASE } from "../../config";
+
 export default function Tabs() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -48,34 +49,77 @@ export default function Tabs() {
     navigate(`/user/view-profile/${id}`);
   };
 
-  const tabs = [
-    { label: <ArrowLeft className="w-5 h-5" />, action: () => navigate(`/user/dashboard`) },
-    { label: "Profile", action: handleViewProfile },
-    { label: "Request a Service", action: () => navigate(`/user/service-request/${id}`) },
-    { label: "My Request History", action: () => navigate(`/user/service-history/${id}`) },
+  const navTabs = [
+    {
+      key: "profile",
+      label: "Profile",
+      icon: CircleUser,
+      match: "view-profile",
+      action: handleViewProfile,
+    },
+    {
+      key: "request",
+      label: "Request a Service",
+      icon: Wrench,
+      match: "service-request",
+      action: () => navigate(`/user/service-request/${id}`),
+    },
+    {
+      key: "history",
+      label: "Request History",
+      icon: History,
+      match: "service-history",
+      action: () => navigate(`/user/service-history/${id}`),
+    },
   ];
 
   return (
-    <div className="flex gap-6 border-b mb-4 cursor-pointer">
-      {tabs.map((tab, index) => {
-        const isActive =
-          (index === 1 && location.pathname.includes("view-profile")) ||
-          (index === 2 && location.pathname.includes("service-request")) ||
-          (index === 3 && location.pathname.includes("service-history"));
+    <div className="sticky top-16 z-20  border-b border-gray-200 bg-white p-2">
+      <div className="flex items-center gap-3">
 
-        return (
-          <button
-            key={index}
-            onClick={tab.action}
-            className={`pb-2 transition ${isActive
-              ? "font-bold text-black border-b-4 border-black"
-              : "text-gray-600 hover:text-black"
-              }`}
-          >
-            {tab.label}
-          </button>
-        );
-      })}
+        <button
+          type="button"
+          onClick={() => navigate("/user/dashboard")}
+          aria-label="Back to dashboard"
+          title="Back to dashboard"
+          className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition hover:border-gray-300 hover:bg-orange-50 hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+        >
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+        </button>
+
+        <span aria-hidden="true" className="h-6 w-px shrink-0 bg-gray-200" />
+
+        <div
+          role="tablist"
+          aria-label="Technician sections"
+          className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto rounded-xl bg-gray-100 p-1"
+        >
+          {navTabs.map((tab) => {
+            const isActive = location.pathname.includes(tab.match);
+            const Icon = tab.icon;
+
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={tab.action}
+                title={tab.label}
+                className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 ${
+                  isActive
+                    ? "bg-white text-orange-600 shadow-sm"
+                    : "text-gray-600 hover:bg-white/70 hover:text-gray-900"
+                }`}
+              >
+                <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-orange-600" : "text-gray-400"}`} />
+                <span className="whitespace-nowrap">{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+      </div>
     </div>
   );
 }

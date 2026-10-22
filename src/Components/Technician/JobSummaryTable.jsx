@@ -1,6 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { API_BASE } from "../../config";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE } from "../../config";
+import { formatDate } from "../utils/format";
+import {
+  ActionButton,
+  IdTag,
+  StatusPill,
+  TableCard,
+  TableEmpty,
+  TableHead,
+  TableScroll,
+  TableSkeleton,
+  Td,
+  Th,
+  Tr,
+} from "../admin/TableUI";
 
 export default function JobSummaryTable() {
   const [jobs, setJobs] = useState([]);
@@ -18,36 +32,21 @@ export default function JobSummaryTable() {
           return;
         }
 
-        const response = await fetch(
-          `${API_BASE}/user/service-request/${techId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${API_BASE}/user/service-request/${techId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch job summaries");
         }
 
         const data = await response.json();
+        const payload = Array.isArray(data) ? data : data?.data ?? data?.requests ?? [];
 
-        const payload = Array.isArray(data)
-          ? data
-          : data?.data ?? data?.requests ?? [];
-
-        const transformedData = payload.map((job) => [
-          "SR/" + job.id,
-          job.full_name,
-          job.instrument_name,
-          job.created_at,
-          job.physical_address,
-          job.status,
-        ]);
-
-        setJobs(transformedData);
+        setJobs(payload);
       } catch (error) {
         console.error("Error fetching job summaries:", error);
       } finally {
@@ -56,107 +55,98 @@ export default function JobSummaryTable() {
     };
 
     fetchJobs();
-  }, []);
+  }, [token]);
 
   return (
-    <div className="bg-white border border-orange-200 rounded-2xl p-4 font-poppins">
-      <div className="flex justify-between items-center mb-4 gap-3">
-        <div>
-          <h3 className="font-bold text-gray-800 text-base lg:text-lg">Job Summary</h3>
-          <p className="text-xs text-gray-500 mt-1">Latest technician activity</p>
-        </div>
-        <Link to="/tech/all-job-summary">
-          <button className="bg-orange-500 text-white px-4 py-2 rounded-xl text-xs lg:text-sm font-medium border border-orange-500 hover:bg-orange-600 transition-colors duration-200">
-            View all
-          </button>
-        </Link>
-      </div>
+    <TableCard>
+      <TableHead
+        title="Job Summary"
+        subtitle="Latest technician activity"
+        actions={
+          <Link to="/tech/all-job-summary">
+            <ActionButton>View all</ActionButton>
+          </Link>
+        }
+      />
 
-      <div className="sm:hidden space-y-3 max-h-[188px] overflow-y-auto pr-1">
-        {jobs.map((row, i) => (
-          <div
-            key={i}
-            className="bg-orange-50 border border-orange-200 rounded-2xl p-4 transition-colors duration-200"
-          >
-            <div className="flex justify-between items-center mb-2 gap-2">
-              <span className="font-bold text-orange-600 text-xs">{row[0]}</span>
-              <span
-                className={`text-[10px] font-semibold px-2 py-1 rounded-full
-            ${row[5] === "Completed" ? "bg-green-100 text-green-700" :
-                    row[5] === "Rejected" ? "bg-red-100 text-red-700" :
-                      row[5] === "Pending" ? "bg-yellow-100 text-yellow-700" :
-                        row[5] === "In Progress" ? "bg-blue-100 text-blue-700" : "bg-orange-100 text-orange-700"}
-          `}
-              >
-                {row[5]}
-              </span>
-            </div>
-
-            <div className="text-[11px] text-gray-700 space-y-1">
-              <p><span className="font-semibold text-gray-800">Client:</span> {row[1]}</p>
-              <p><span className="font-semibold text-gray-800">Instrument:</span> {row[2]}</p>
-              <p>
-                <span className="font-semibold text-gray-800">Date:</span>{" "}
-                {new Date(row[3]).toLocaleDateString()}
-              </p>
-              <p className="truncate">
-                <span className="font-semibold text-gray-800">Location:</span> {row[4]}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="hidden sm:block overflow-x-auto">
-        {loading ? (
-          <p className="text-gray-500 italic p-4 text-center">Loading...</p>
-        ) : jobs.length === 0 ? (
-          <p className="text-gray-500 italic p-4 text-center">
-            No job summaries found.
-          </p>
-        ) : (
-          <div className="max-h-[188px] overflow-y-auto rounded-xl border border-orange-200">
-            <table className="w-full text-left text-sm border-collapse">
-              <thead className="sticky top-0 bg-orange-100">
+      {loading ? (
+        <TableSkeleton rows={5} columns={6} />
+      ) : jobs.length === 0 ? (
+        <TableEmpty
+          title="No job summaries"
+          message="Jobs you accept will show up here with their latest status."
+        />
+      ) : (
+        <>
+          {/* Desktop Table */}
+          <div className="hidden lg:block">
+            <TableScroll maxHeight="max-h-[320px]">
+              <thead>
                 <tr>
-                  <th className="p-3 font-semibold text-gray-700 text-left">Request ID</th>
-                  <th className="p-3 font-semibold text-gray-700 text-left">Client Name</th>
-                  <th className="p-3 font-semibold text-gray-700 text-left">Instrument Name</th>
-                  <th className="p-3 font-semibold text-gray-700 text-left">Request Date</th>
-                  <th className="p-3 font-semibold text-gray-700 text-left">Location</th>
-                  <th className="p-3 font-semibold text-gray-700 text-left">Status</th>
+                  <Th>Request</Th>
+                  <Th>Client</Th>
+                  <Th>Instrument</Th>
+                  <Th>Requested On</Th>
+                  <Th>Location</Th>
+                  <Th>Status</Th>
                 </tr>
               </thead>
+
               <tbody>
-                {jobs.map((row, i) => (
-                  <tr key={i} className="border-b border-orange-100 hover:bg-orange-50 transition-colors duration-200">
-                    {row.map((cell, j) => (
-                      <td
-                        key={j}
-                        className={`p-3 text-xs sm:text-sm truncate max-w-[140px] ${
-                          cell === "Pass"
-                            ? "text-green-600 font-bold"
-                            : cell === "Rejected"
-                              ? "text-red-600 font-bold"
-                              : cell === "Pending"
-                                ? "text-yellow-600 font-bold"
-                                : cell === "In Progress"
-                                  ? "text-blue-600 font-bold"
-                                  : cell === "Completed"
-                                    ? "text-green-600 font-bold"
-                                    : "text-gray-700"
-                        }`}
-                      >
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
+                {jobs.map((job) => (
+                  <Tr key={job.id}>
+                    <Td>
+                      <IdTag prefix="SR-" value={String(job.id).padStart(4, "0")} />
+                    </Td>
+                    <Td>{job.full_name}</Td>
+                    <Td>
+                      <span className="text-gray-600">{job.instrument_name}</span>
+                    </Td>
+                    <Td>
+                      <span className="whitespace-nowrap text-xs text-gray-500">
+                        {formatDate(job.created_at)}
+                      </span>
+                    </Td>
+                    <Td>
+                      <span className="block max-w-[180px] truncate text-gray-600">
+                        {job.physical_address}
+                      </span>
+                    </Td>
+                    <Td>
+                      <StatusPill status={job.status} />
+                    </Td>
+                  </Tr>
                 ))}
               </tbody>
-            </table>
+            </TableScroll>
           </div>
-        )}
-      </div>
-    </div>
+
+          {/* Mobile Cards */}
+          <div className="lg:hidden p-4 space-y-3 max-h-[400px] overflow-y-auto">
+            {jobs.map((job) => (
+              <div
+                key={job.id}
+                className="border-2 border-gray-200 rounded-xl p-4 bg-white space-y-2"
+              >
+                <div className="flex justify-between items-start gap-2">
+                  <IdTag prefix="SR-" value={String(job.id).padStart(4, "0")} />
+                  <StatusPill status={job.status} />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{job.full_name}</p>
+                  <p className="text-xs text-gray-600 mt-0.5">{job.instrument_name}</p>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                  <span><span className="font-medium">Requested:</span> {formatDate(job.created_at)}</span>
+                </div>
+                <p className="text-xs text-gray-500 line-clamp-1">
+                  <span className="font-medium">Location:</span> {job.physical_address}
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </TableCard>
   );
 }

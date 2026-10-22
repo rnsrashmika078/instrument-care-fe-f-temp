@@ -43,7 +43,7 @@ export default function FeatureCards() {
         {cards.map((card, index) => (
           <div
             key={index}
-            className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
+            className="bg-white rounded-xl shadow-sm p-6 border-2 border-gray-200"
           >
             <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-400 to-orange-600 flex items-center justify-center text-white text-xl mb-4">
               {card.icon}

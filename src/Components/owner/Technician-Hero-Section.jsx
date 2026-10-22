@@ -53,7 +53,7 @@ export default function TechnicianHeader({ searchTerm, setSearchTerm }) {
   // );
 
   return (
-    <section className="relative overflow-hidden border-b border-orange-100 bg-[#fffaf5]">
+    <section className="relative overflow-hidden border-b border-gray-100 bg-[#fffaf5]">
       <div className="absolute inset-0 z-0">
         <img src={BG} alt="Background" className="h-full w-full object-cover" />
       </div>
@@ -62,7 +62,7 @@ export default function TechnicianHeader({ searchTerm, setSearchTerm }) {
       <div className="relative z-20 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="order-2 space-y-6 lg:order-1">
-            <div className="inline-flex items-center rounded-full border border-orange-200 bg-orange-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-orange-600">
+            <div className="inline-flex items-center rounded-full border border-gray-200 bg-orange-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-orange-600">
               Trusted service network
             </div>
 
@@ -89,8 +89,8 @@ export default function TechnicianHeader({ searchTerm, setSearchTerm }) {
           </div>
 
           <div className="order-1 flex justify-center lg:order-2 lg:justify-end">
-            <div className="relative w-full max-w-md rounded-[2rem] border border-orange-200 bg-white p-3 md:p-4">
-              <div className="overflow-hidden rounded-[1.5rem] border border-orange-100 bg-orange-50">
+            <div className="relative w-full max-w-md rounded-[2rem] border-2 border-gray-200 bg-white p-3 md:p-4">
+              <div className="overflow-hidden rounded-[1.5rem] border border-gray-100 bg-orange-50">
                 <img
                   src={Technician}
                   alt="Technician"
@@ -99,13 +99,13 @@ export default function TechnicianHeader({ searchTerm, setSearchTerm }) {
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-orange-200 bg-orange-50 p-3">
+                <div className="rounded-2xl border border-gray-200 bg-orange-50 p-3">
                   <p className="text-xs font-medium uppercase tracking-[0.12em] text-orange-600">
                     Active
                   </p>
                   <p className="mt-1 text-2xl font-bold text-gray-900">250+</p>
                 </div>
-                <div className="rounded-2xl border border-orange-200 bg-orange-50 p-3">
+                <div className="rounded-2xl border border-gray-200 bg-orange-50 p-3">
                   <p className="text-xs font-medium uppercase tracking-[0.12em] text-orange-600">
                     Rating
                   </p>

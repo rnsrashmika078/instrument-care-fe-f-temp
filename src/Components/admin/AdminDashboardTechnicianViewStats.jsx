@@ -1,68 +1,131 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Inbox } from "lucide-react";
 import { API_BASE } from "../../config";
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts";
+import { ChartEmptyState, ChartSkeleton } from "./ChartStates";
 
 export default function AdminDashboardTechnicianViewStats() {
     const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
     const token = sessionStorage.getItem("token");
 
     useEffect(() => {
+        let active = true;
+
+        const fetchTopTechnicians = async () => {
+            try {
+                const res = await fetch(
+                    `${API_BASE}/admin/technician-view-count`,
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                const result = await res.json();
+                if (active) setData(Array.isArray(result) ? result : []);
+            } catch (error) {
+                console.error("Error fetching technician stats:", error);
+            } finally {
+                if (active) setLoading(false);
+            }
+        };
+
         fetchTopTechnicians();
+
+        return () => {
+            active = false;
+        };
     }, []);
 
-    const fetchTopTechnicians = async () => {
-        try {
-            const res = await fetch(
-                `${API_BASE}/admin/technician-view-count`,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            const result = await res.json();
-            setData(result);
-        } catch (error) {
-            console.error("Error fetching technician stats:", error);
-        }
-    };
-
-    // Get max value to scale bars
-    const maxViews = Math.max(...data.map((d) => d.views), 1);
+    const hasData = data.some((row) => Number(row.views) > 0);
 
     return (
-        <div className="rounded-[1.5rem] border border-orange-100 bg-white p-4 md:p-5">
+        <div className="flex flex-col rounded-[1.5rem] border border-gray-200 bg-white p-4 md:p-5">
             <h3 className="mb-5 text-lg font-bold text-gray-900">
                 Top Most Viewed Technicians
             </h3>
 
-            <div className="space-y-4">
-                {data.map((tech) => {
-                    const widthPercent = (tech.views / maxViews) * 100;
-
-                    return (
-                        <div key={tech.id} className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between gap-3 text-sm text-gray-700">
-                                <span className="font-semibold text-gray-800">
-                                    {tech.technician_name}
-                                </span>
-                                <span className="text-xs font-medium text-orange-600">
-                                    {tech.views} views
-                                </span>
-                            </div>
-
-                            <div className="h-2.5 w-full overflow-hidden rounded-full bg-orange-100">
-                                <div
-                                    className="h-full rounded-full bg-orange-500 transition-all duration-500"
-                                    style={{ width: `${widthPercent}%` }}
-                                    title={`ID: ${tech.id} | ${tech.views} views`}
-                                ></div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+            {loading ? (
+                <ChartSkeleton height="h-[300px]" />
+            ) : !hasData ? (
+                <ChartEmptyState
+                    icon={Inbox}
+                    title="No technician views yet"
+                    message="Once clients start viewing technician profiles, the top ten will be ranked here."
+                />
+            ) : (
+                <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                            data={data}
+                            layout="vertical"
+                            margin={{ top: 4, right: 24, bottom: 4, left: 8 }}
+                        >
+                            <defs>
+                                <linearGradient
+                                    id="techViewsBar"
+                                    x1="0"
+                                    y1="0"
+                                    x2="1"
+                                    y2="0"
+                                >
+                                    <stop offset="0%" stopColor="#fb923c" />
+                                    <stop offset="100%" stopColor="#ea580c" />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid
+                                stroke="#f3f4f6"
+                                strokeDasharray="5 5"
+                                horizontal={false}
+                            />
+                            <XAxis
+                                type="number"
+                                allowDecimals={false}
+                                tick={{ fontSize: 11 }}
+                                stroke="#9ca3af"
+                            />
+                            <YAxis
+                                type="category"
+                                dataKey="technician_name"
+                                width={130}
+                                tick={{ fontSize: 12, fill: "#374151" }}
+                                stroke="#9ca3af"
+                                tickFormatter={(value) =>
+                                    value?.length > 18
+                                        ? `${value.slice(0, 18)}…`
+                                        : value
+                                }
+                            />
+                            <Tooltip
+                                cursor={{ fill: "#fff7ed" }}
+                                contentStyle={{
+                                    backgroundColor: "#ffffff",
+                                    border: "1px solid #e5e7eb",
+                                    borderRadius: "12px",
+                                    fontSize: "12px",
+                                }}
+                            />
+                            <Bar
+                                dataKey="views"
+                                fill="url(#techViewsBar)"
+                                radius={[0, 8, 8, 0]}
+                                barSize={18}
+                            />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
         </div>
     );
 }

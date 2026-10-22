@@ -61,11 +61,11 @@ export default function Service_Request() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 bg-[#ffffff80] rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-4">Service Request</h2>
+        <main className="flex-1 bg-[#ffffff80] rounded-lg p-4 border-2 border-gray-200">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Service Request</h2>
 
           {loading ? (
-            <p>Loading service requests...</p>
+            <p className="text-sm text-gray-500">Loading service requests...</p>
           ) : (
             <ServiceRequestTable_Request
               data={requestData}

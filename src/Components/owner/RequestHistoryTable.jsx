@@ -1,6 +1,80 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { FaEye } from "react-icons/fa";
 import { API_BASE } from "../../config";
+import { dateOnly } from "../utils/format";
+import { formatPhone } from "../utils/phone";
+import {
+  DateField,
+  FilterSelect,
+  IconButton,
+  IdTag,
+  RecordsBadge,
+  SearchInput,
+  StatusPill,
+  TableCard,
+  TableEmpty,
+  TableHead,
+  TableScroll,
+  TableSkeleton,
+  TableToolbar,
+  Td,
+  Th,
+  Tr,
+} from "../admin/TableUI";
+
+const STATUS_OPTIONS = [
+  { value: "All", label: "All Statuses" },
+  { value: "Pending", label: "Pending" },
+  { value: "In Progress", label: "In Progress" },
+  { value: "Completed", label: "Completed" },
+  { value: "Cancelled", label: "Cancelled" },
+];
+
+const DETAIL_GROUPS = [
+  {
+    title: "Requester",
+    fields: [
+      ["Full Name", "full_name"],
+      ["Email", "email"],
+      ["Contact", "contact_number"],
+      ["Address", "physical_address"],
+    ],
+  },
+  {
+    title: "Instrument",
+    fields: [
+      ["Instrument Name", "instrument_name"],
+      ["Instrument Brand", "instrument_brand"],
+      ["Instrument Model", "instrument_model"],
+      ["Manufacturer", "instrument_manufacturer"],
+      ["Manufactured Year", "manufactured_year"],
+      ["Product Testing Type", "product_testing_type"],
+      ["Testing Parameter", "testing_parameter"],
+      ["Consumption Period", "consumption_period"],
+    ],
+  },
+  {
+    title: "Technician",
+    fields: [
+      ["Technician Name", "technician_name"],
+      ["Technician Email", "technician_email"],
+      ["Technician Contact", "personal_number"],
+      ["Institute Name", "institute_name"],
+    ],
+  },
+];
+
+function DetailItem({ label, children, wide = false }) {
+  return (
+    <div className={wide ? "sm:col-span-2" : ""}>
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+        {label}
+      </p>
+      <div className="mt-1 text-sm text-gray-700">{children ?? "\u2014"}</div>
+    </div>
+  );
+}
 
 export default function RequestHistoryTable() {
   const { id: techId } = useParams(); // Technician ID
@@ -16,27 +90,36 @@ export default function RequestHistoryTable() {
   const [reviewStatus, setReviewStatus] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
   const filteredJobs = jobs.filter((job) => {
-    const searchLower = searchTerm.toLowerCase();
-    const idMatch = `SR/${job.id}`.toLowerCase().includes(searchLower);
-    const instrumentMatch = job.instrument_name?.toLowerCase().includes(searchLower);
-    const descriptionMatch = job.issue_description?.toLowerCase().includes(searchLower);
-    const statusMatch = job.status?.toLowerCase().includes(searchLower);
-    const requestDateMatch = job.created_at?.toLowerCase().includes(searchLower);
-    const acceptedDateMatch = job.accepted_at?.toLowerCase().includes(searchLower);
-    const completedDateMatch = job.completed_at?.toLowerCase().includes(searchLower);
+    const query = searchTerm.trim().toLowerCase();
+    const haystack = [
+      `SR/${job.id}`,
+      `SR-${String(job.id).padStart(4, "0")}`,
+      job.instrument_name,
+      job.issue_description,
+      job.technician_name,
+      job.status,
+      job.created_at,
+      job.start_date,
+      job.end_date,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
 
-    const matchesSearch = !searchTerm || idMatch || instrumentMatch || descriptionMatch || statusMatch || requestDateMatch || acceptedDateMatch || completedDateMatch;
+    const matchesSearch = !query || haystack.includes(query);
+    const matchesStatus = statusFilter === "All" || job.status === statusFilter;
 
-    const jobDate = job.created_at?.split(" ")[0] || "";
+    const jobDate = dateOnly(job.created_at);
     let matchesDate = true;
-    if (fromDate && jobDate < fromDate) matchesDate = false;
-    if (toDate && jobDate > toDate) matchesDate = false;
+    if (fromDate && (!jobDate || jobDate < fromDate)) matchesDate = false;
+    if (toDate && (!jobDate || jobDate > toDate)) matchesDate = false;
 
-    return matchesSearch && matchesDate;
+    return matchesSearch && matchesStatus && matchesDate;
   });
 
   useEffect(() => {
@@ -45,30 +128,27 @@ export default function RequestHistoryTable() {
     const fetchServiceRequests = async () => {
       setLoading(true);
       try {
-        const userId = sessionStorage.getItem("user_id"); //  get logged-in user ID
+        const userId = sessionStorage.getItem("user_id");
         if (!userId) throw new Error("User not logged in");
 
         const response = await fetch(
           `${API_BASE}/user/service-request/${techId}/my-requests`,
           {
-            method: "POST", // POST request to send user_id
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ user_id: userId }), //  send user_id in body
-          }
+            body: JSON.stringify({ user_id: userId }),
+          },
         );
-        console.log(response);
 
         const data = await response.json();
-        console.log(data);
 
         if (!response.ok) {
           throw new Error(data.error || "No data found or server error");
         }
 
-        //  Support both array and object responses
         if (Array.isArray(data)) {
           setJobs(data);
         } else if (data.data && Array.isArray(data.data)) {
@@ -85,7 +165,7 @@ export default function RequestHistoryTable() {
     };
 
     fetchServiceRequests();
-  }, [techId]);
+  }, [techId, token]);
 
   // Reset review form when modal opens with a new job
   useEffect(() => {
@@ -109,10 +189,10 @@ export default function RequestHistoryTable() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ rate: rating, review: reviewText }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -128,424 +208,227 @@ export default function RequestHistoryTable() {
     }
   };
 
-  // return (
-  //   <div className="bg-[#ffffff80] rounded-lg shadow-sm p-4 font-poppins">
-  //     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-  //       <h3 className="font-bold text-lg">Service Request History</h3>
-  //       <div className="flex flex-col xl:flex-row gap-3 w-full md:w-auto items-start xl:items-center">
-  //         <input
-  //           type="text"
-  //           placeholder="Search by ID, instrument, status..."
-  //           className="border px-3 py-2 rounded-md text-sm w-full md:w-64 focus:outline-none focus:ring-1 focus:ring-orange-400"
-  //           value={searchTerm}
-  //           onChange={(e) => setSearchTerm(e.target.value)}
-  //         />
-  //         <div className="flex items-center gap-2">
-  //           <span className="text-sm font-medium text-gray-600">Request Date</span>
-  //           <input
-  //             type="date"
-  //             className="border px-2 py-1.5 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-orange-400"
-  //             value={fromDate}
-  //             onChange={(e) => setFromDate(e.target.value)}
-  //           />
-  //           <span className="text-sm font-medium text-gray-600">To</span>
-  //           <input
-  //             type="date"
-  //             className="border px-2 py-1.5 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-orange-400"
-  //             value={toDate}
-  //             onChange={(e) => setToDate(e.target.value)}
-  //           />
-  //         </div>
-  //       </div>
-  //     </div>
-
-  //     <div className="mb-2">
-  //       <p className="text-gray-500 italic text-sm">*Please click on the row if available to view more details</p>
-  //     </div>
-
-  //     <div className="overflow-x-auto">
-  //       <div className="max-h-[540px] overflow-y-auto">
-  //         <table className="w-full text-left text-sm border-collapse">
-  //           <thead>
-  //             <tr className="border-b">
-  //               <th className="p-2">Request ID</th>
-  //               <th className="p-2">Instrument Name</th>
-  //               <th className="p-2">Problem Description</th>
-  //               <th className="p-2">Request Date</th>
-  //               <th className="p-2">Accepted Date</th>
-  //               <th className="p-2">Completed Date</th>
-  //               <th className="p-2">Status</th>
-  //             </tr>
-  //           </thead>
-  //           <tbody>
-  //             {loading ? (
-  //               <tr>
-  //                 <td colSpan={7} className="text-center text-gray-500 italic p-4">
-  //                   Loading...
-  //                 </td>
-  //               </tr>
-  //             ) : filteredJobs.length === 0 ? (
-  //               <tr>
-  //                 <td colSpan={7} className="text-center text-gray-500 italic p-4">
-  //                   No matching job summaries found.
-  //                 </td>
-  //               </tr>
-  //             ) : (
-  //               filteredJobs.map((job) => (
-  //                 <tr
-  //                   key={job.id}
-  //                   className="border-b hover:bg-gray-100 cursor-pointer"
-  //                   onClick={() => setSelectedJob(job)}
-  //                 >
-  //                   <td className="p-2">SR/{job.id}</td>
-  //                   <td className="p-2">{job.instrument_name}</td>
-  //                   <td className="p-2">{job.issue_description}</td>
-  //                   <td className="p-2">{job.created_at?.split(" ")[0]}</td>
-  //                   <td className="p-2">{job.start_date?.split(" ")[0]}</td>
-  //                   <td className="p-2">{job.end_date?.split(" ")[0]}</td>
-  //                   <td
-  //                     className={`p-2 font-bold ${job.status === "In Progress"
-  //                       ? "text-blue-500"
-  //                       : job.status === "Rejected"
-  //                         ? "text-red-500"
-  //                         : job.status === "Pending"
-  //                           ? "text-yellow-500"
-  //                           : job.status === "Completed"
-  //                             ? "text-green-500"
-  //                             : ""
-  //                       }`}
-  //                   >
-  //                     {job.status}
-  //                   </td>
-  //                 </tr>
-  //               ))
-  //             )}
-  //           </tbody>
-  //         </table>
-  //       </div>
-  //     </div>
-
-  //     {/* Popup Modal */}
-  //     {selectedJob && (
-  //       <div className="fixed inset-0 bg-[#00000090] flex items-center justify-center z-50">
-  //         <div className="bg-white p-6 rounded-lg shadow-lg w-[800px] max-h-[80vh] overflow-y-auto">
-  //           <h2 className="text-lg font-bold mb-4">
-  //             Service Request #{selectedJob.id}
-  //           </h2>
-  //           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-  //             <p><strong>Full Name:</strong> {selectedJob.full_name}</p>
-  //             <p><strong>Email:</strong> {selectedJob.email}</p>
-  //             <p><strong>Contact:</strong> {selectedJob.contact_number}</p>
-  //             <p><strong>Address:</strong> {selectedJob.physical_address}</p>
-  //             <p><strong>Institute Name:</strong> {selectedJob.institute_name}</p>
-  //             <p><strong>Institute Address:</strong> {selectedJob.institute_address}</p>
-  //             <p><strong>Instrument Name:</strong> {selectedJob.instrument_name}</p>
-  //             <p><strong>Instrument Brand:</strong> {selectedJob.instrument_brand}</p>
-  //             <p><strong>Instrument Model:</strong> {selectedJob.instrument_model}</p>
-  //             <p><strong>Instrument Manufacturer:</strong> {selectedJob.instrument_manufacturer}</p>
-  //             <p><strong>ManufacturedYear:</strong> {selectedJob.manufactured_year}</p>
-  //             <p><strong>Product Testing Type:</strong> {selectedJob.product_testing_type}</p>
-  //             <p><strong>Testing Parameter:</strong> {selectedJob.testing_parameter}</p>
-  //             <p><strong>Consumption Period:</strong> {selectedJob.consumption_period}</p>
-  //             <p className="col-span-2"><strong>Problem Description:</strong> {selectedJob.issue_description}</p>
-  //             <p className="col-span-2">
-  //               <strong>Status:</strong>{" "}
-  //               <span
-  //                 className={`font-bold ${selectedJob.status === "In Progress"
-  //                   ? "text-blue-500"
-  //                   : selectedJob.status === "Rejected"
-  //                     ? "text-red-500"
-  //                     : selectedJob.status === "Pending"
-  //                       ? "text-yellow-500"
-  //                       : selectedJob.status === "Completed"
-  //                         ? "text-green-500"
-  //                         : ""
-  //                   }`}
-  //               >
-  //                 {selectedJob.status}
-  //               </span>
-  //             </p>
-  //           </div>
-
-  //           {/* Rate & Review Section (Only for Completed jobs) */}
-  //           {selectedJob.status === "Completed" && selectedJob.rate === 0 && (
-  //             <div className="mt-6 border-t pt-4">
-  //               <h3 className="font-bold text-lg mb-2">Rate & Review Technician</h3>
-  //               <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-3">
-  //                 <div className="flex items-center">
-  //                   <span className="mr-3 font-semibold text-gray-700">Rating:</span>
-  //                   <div className="flex">
-  //                     {[1, 2, 3, 4, 5].map((star) => (
-  //                       <button
-  //                         key={star}
-  //                         onClick={() => setRating(star)}
-  //                         className={`text-3xl transition ${rating >= star ? "text-yellow-400" : "text-gray-300 hover:text-yellow-200"
-  //                           }`}
-  //                       >
-  //                         ★
-  //                       </button>
-  //                     ))}
-  //                   </div>
-  //                 </div>
-  //               </div>
-
-  //               <textarea
-  //                 className="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 mb-3"
-  //                 rows="3"
-  //                 placeholder="Share your experience working with this technician..."
-  //                 value={reviewText}
-  //                 onChange={(e) => setReviewText(e.target.value)}
-  //                 disabled={reviewStatus === "Review submitted successfully!"}
-  //               ></textarea>
-
-  //               <div className="flex justify-between items-center">
-  //                 <span
-  //                   className={`font-semibold ${reviewStatus.includes("successfully")
-  //                     ? "text-green-600"
-  //                     : "text-red-500"
-  //                     }`}
-  //                 >
-  //                   {reviewStatus}
-  //                 </span>
-
-  //                 {reviewStatus !== "Review submitted successfully!" && (
-  //                   <button
-  //                     onClick={submitReview}
-  //                     disabled={isSubmittingReview || rating === 0 || !reviewText.trim()}
-  //                     className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold shadow transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-  //                   >
-  //                     {isSubmittingReview ? "Submitting..." : "Submit Review"}
-  //                   </button>
-  //                 )}
-  //               </div>
-  //             </div>
-  //           )}
-
-  //           <div className="flex justify-end mt-6 border-t pt-4">
-  //             <button
-  //               onClick={() => setSelectedJob(null)}
-  //               className="bg-gray-500 text-white px-5 py-2 rounded hover:bg-gray-600 transition"
-  //             >
-  //               Close
-  //             </button>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     )}
-  //   </div>
-  // );
-
   return (
-    <div className="bg-[#ffffff80] rounded-lg shadow-sm p-4 font-poppins">
-
-      {/* Header + Filters */}
-      <div className="flex flex-col gap-3 mb-4">
-        <h3 className="font-bold text-lg">Service Request History</h3>
-        <input
-          type="text"
-          placeholder="Search by ID, instrument, status..."
-          className="border px-3 py-2 rounded-md text-sm w-full focus:outline-none focus:ring-1 focus:ring-orange-400"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+    <>
+      <TableCard>
+        <TableHead
+          title="Service Request History"
+          subtitle="Previous requests raised for this technician"
         />
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <span className="text-sm font-medium text-gray-600">Request Date</span>
-          <input
-            type="date"
-            className="border px-2 py-1.5 rounded-md text-sm w-full sm:w-auto focus:outline-none focus:ring-1 focus:ring-orange-400"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-          />
-          <span className="text-sm font-medium text-gray-600">To</span>
-          <input
-            type="date"
-            className="border px-2 py-1.5 rounded-md text-sm w-full sm:w-auto focus:outline-none focus:ring-1 focus:ring-orange-400"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-          />
-        </div>
-      </div>
 
-      <p className="text-gray-500 italic text-sm mb-2">
-        *Please click on the row/card if available to view more details
-      </p>
+        <TableToolbar>
+          <SearchInput
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Search by ID, instrument, status…"
+          />
+          <FilterSelect
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={STATUS_OPTIONS}
+            className="sm:max-w-[10.5rem]"
+          />
+          <DateField label="From" value={fromDate} onChange={setFromDate} />
+          <DateField label="To" value={toDate} onChange={setToDate} />
+          <RecordsBadge count={filteredJobs.length} noun="requests" />
+        </TableToolbar>
 
-      {/* Desktop Table */}
-      <div className="hidden md:block overflow-x-auto">
-        <div className="max-h-[540px] overflow-y-auto">
-          <table className="w-full text-left text-sm border-collapse">
+        {loading ? (
+          <TableSkeleton rows={8} columns={7} />
+        ) : filteredJobs.length === 0 ? (
+          <TableEmpty
+            title="No service requests"
+            message="No requests match the current search, status or date range."
+            hint="Try clearing the filters"
+          />
+        ) : (
+          <TableScroll>
             <thead>
-              <tr className="border-b">
-                <th className="p-2">Request ID</th>
-                <th className="p-2">Instrument Name</th>
-                <th className="p-2">Problem Description</th>
-                <th className="p-2">Request Date</th>
-                <th className="p-2">Accepted Date</th>
-                <th className="p-2">Completed Date</th>
-                <th className="p-2">Status</th>
+              <tr>
+                <Th>Request</Th>
+                <Th>Instrument</Th>
+                <Th>Problem Description</Th>
+                <Th>Technician</Th>
+                <Th>Status</Th>
+                <Th>Requested On</Th>
+                <Th>Accepted On</Th>
+                <Th>Completed On</Th>
+                <Th align="center">Actions</Th>
               </tr>
             </thead>
+
             <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={7} className="text-center text-gray-500 italic p-4">Loading...</td>
-                </tr>
-              ) : filteredJobs.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center text-gray-500 italic p-4">No matching job summaries found.</td>
-                </tr>
-              ) : (
-                filteredJobs.map((job) => (
-                  <tr
-                    key={job.id}
-                    className="border-b hover:bg-gray-100 cursor-pointer"
-                    onClick={() => setSelectedJob(job)}
-                  >
-                    <td className="p-2">SR/{job.id}</td>
-                    <td className="p-2">{job.instrument_name}</td>
-                    <td className="p-2">{job.issue_description}</td>
-                    <td className="p-2">{job.created_at?.split(" ")[0]}</td>
-                    <td className="p-2">{job.start_date?.split(" ")[0]}</td>
-                    <td className="p-2">{job.end_date?.split(" ")[0]}</td>
-                    <td className={`p-2 font-bold ${
-                      job.status === "In Progress" ? "text-blue-500"
-                      : job.status === "Rejected" ? "text-red-500"
-                      : job.status === "Pending" ? "text-yellow-500"
-                      : job.status === "Completed" ? "text-green-500"
-                      : ""
-                    }`}>
-                      {job.status}
-                    </td>
-                  </tr>
-                ))
-              )}
+              {filteredJobs.map((job) => (
+                <Tr key={job.id} onClick={() => setSelectedJob(job)}>
+                  <Td>
+                    <IdTag value={`SR-${String(job.id).padStart(4, "0")}`} />
+                  </Td>
+                  <Td>
+                    <span className="text-gray-600">{job.instrument_name}</span>
+                  </Td>
+                  <Td>
+                    <span className="line-clamp-2" title={job.issue_description}>
+                      {job.issue_description || "\u2014"}
+                    </span>
+                  </Td>
+                  <Td>{job.technician_name || "Unassigned"}</Td>
+                  <Td>
+                    <StatusPill status={job.status} />
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {dateOnly(job.created_at)}
+                    </span>
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {dateOnly(job.start_date)}
+                    </span>
+                  </Td>
+                  <Td>
+                    <span className="whitespace-nowrap text-xs text-gray-500">
+                      {dateOnly(job.end_date)}
+                    </span>
+                  </Td>
+                  <Td align="center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <IconButton
+                        tone="blue"
+                        icon={FaEye}
+                        title="View Details"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedJob(job);
+                        }}
+                      />
+                    </div>
+                  </Td>
+                </Tr>
+              ))}
             </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Mobile Cards */}
-      <div className="md:hidden space-y-3">
-        {loading ? (
-          <p className="text-center text-gray-500 italic p-4">Loading...</p>
-        ) : filteredJobs.length === 0 ? (
-          <p className="text-center text-gray-500 italic p-4">No matching job summaries found.</p>
-        ) : (
-          filteredJobs.map((job) => (
-            <div
-              key={job.id}
-              className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm space-y-1 cursor-pointer hover:bg-gray-50"
-              onClick={() => setSelectedJob(job)}
-            >
-              <div className="flex justify-between items-center">
-                <p className="font-semibold text-gray-800">SR/{job.id}</p>
-                <span className={`text-xs font-bold ${
-                  job.status === "In Progress" ? "text-blue-500"
-                  : job.status === "Rejected" ? "text-red-500"
-                  : job.status === "Pending" ? "text-yellow-500"
-                  : job.status === "Completed" ? "text-green-500"
-                  : ""
-                }`}>
-                  {job.status}
-                </span>
-              </div>
-              <p className="text-sm text-gray-700 font-medium">{job.instrument_name}</p>
-              <p className="text-xs text-gray-500 line-clamp-2">{job.issue_description}</p>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-xs text-gray-400">
-                <span><span className="font-medium text-gray-500">Requested:</span> {job.created_at?.split(" ")[0]}</span>
-                <span><span className="font-medium text-gray-500">Accepted:</span> {job.start_date?.split(" ")[0] || "-"}</span>
-                <span><span className="font-medium text-gray-500">Completed:</span> {job.end_date?.split(" ")[0] || "-"}</span>
-              </div>
-            </div>
-          ))
+          </TableScroll>
         )}
-      </div>
+      </TableCard>
 
-      {/* Modal */}
       {selectedJob && (
-        <div className="fixed inset-0 bg-[#00000090] flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-5 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-bold mb-4">Service Request #{selectedJob.id}</h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <p><strong>Full Name:</strong> {selectedJob.full_name}</p>
-              <p><strong>Email:</strong> {selectedJob.email}</p>
-              <p><strong>Contact:</strong> {selectedJob.contact_number}</p>
-              <p><strong>Address:</strong> {selectedJob.physical_address}</p>
-              <p><strong>Institute Name:</strong> {selectedJob.institute_name}</p>
-              <p><strong>Institute Address:</strong> {selectedJob.institute_address}</p>
-              <p><strong>Instrument Name:</strong> {selectedJob.instrument_name}</p>
-              <p><strong>Instrument Brand:</strong> {selectedJob.instrument_brand}</p>
-              <p><strong>Instrument Model:</strong> {selectedJob.instrument_model}</p>
-              <p><strong>Manufacturer:</strong> {selectedJob.instrument_manufacturer}</p>
-              <p><strong>Manufactured Year:</strong> {selectedJob.manufactured_year}</p>
-              <p><strong>Product Testing Type:</strong> {selectedJob.product_testing_type}</p>
-              <p><strong>Testing Parameter:</strong> {selectedJob.testing_parameter}</p>
-              <p><strong>Consumption Period:</strong> {selectedJob.consumption_period}</p>
-              <p className="sm:col-span-2"><strong>Problem Description:</strong> {selectedJob.issue_description}</p>
-              <p className="sm:col-span-2">
-                <strong>Status:</strong>{" "}
-                <span className={`font-bold ${
-                  selectedJob.status === "In Progress" ? "text-blue-500"
-                  : selectedJob.status === "Rejected" ? "text-red-500"
-                  : selectedJob.status === "Pending" ? "text-yellow-500"
-                  : selectedJob.status === "Completed" ? "text-green-500"
-                  : ""
-                }`}>
-                  {selectedJob.status}
-                </span>
-              </p>
-            </div>
-
-            {/* Rate & Review */}
-            {selectedJob.status === "Completed" && selectedJob.rate === 0 && (
-              <div className="mt-6 border-t pt-4">
-                <h3 className="font-bold text-lg mb-2">Rate & Review Technician</h3>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="font-semibold text-gray-700">Rating:</span>
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        onClick={() => setRating(star)}
-                        className={`text-3xl transition ${rating >= star ? "text-yellow-400" : "text-gray-300 hover:text-yellow-200"}`}
-                      >
-                        ★
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <textarea
-                  className="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 mb-3"
-                  rows="3"
-                  placeholder="Share your experience working with this technician..."
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                  disabled={reviewStatus === "Review submitted successfully!"}
-                />
-
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                  <span className={`font-semibold text-sm ${reviewStatus.includes("successfully") ? "text-green-600" : "text-red-500"}`}>
-                    {reviewStatus}
-                  </span>
-                  {reviewStatus !== "Review submitted successfully!" && (
-                    <button
-                      onClick={submitReview}
-                      disabled={isSubmittingReview || rating === 0 || !reviewText.trim()}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold shadow transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
-                    >
-                      {isSubmittingReview ? "Submitting..." : "Submit Review"}
-                    </button>
-                  )}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm">
+          <div className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-gray-100 bg-gradient-to-b from-white to-orange-50/40 px-6 py-4">
+              <div className="min-w-0">
+                <h2 className="text-xl font-bold tracking-tight text-gray-900">
+                  Service Request Details
+                </h2>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <IdTag prefix="SR-" value={String(selectedJob.id).padStart(4, "0")} />
+                  <StatusPill status={selectedJob.status} />
                 </div>
               </div>
-            )}
-
-            <div className="flex justify-end mt-6 border-t pt-4">
               <button
                 onClick={() => setSelectedJob(null)}
-                className="bg-gray-500 text-white px-5 py-2 rounded hover:bg-gray-600 transition w-full sm:w-auto"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                title="Close"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="flex-grow space-y-6 overflow-y-auto p-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <DetailItem label="Problem Description" wide>
+                  {selectedJob.issue_description}
+                </DetailItem>
+                <DetailItem label="Request Date">{dateOnly(selectedJob.created_at)}</DetailItem>
+                <DetailItem label="Accept Date">{dateOnly(selectedJob.start_date)}</DetailItem>
+                <DetailItem label="Completed Date">{dateOnly(selectedJob.end_date)}</DetailItem>
+                <DetailItem label="Institute Address" wide>
+                  {selectedJob.institute_address}
+                </DetailItem>
+              </div>
+
+              {DETAIL_GROUPS.map((group) => (
+                <section key={group.title}>
+                  <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-orange-600">
+                    {group.title}
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {group.fields.map(([label, key]) => (
+                      <DetailItem key={key} label={label}>
+                        {key === "personal_number" || key === "contact_number"
+                          ? formatPhone(selectedJob[key])
+                          : selectedJob[key]}
+                      </DetailItem>
+                    ))}
+                  </div>
+                </section>
+              ))}
+
+              {/* Rate & Review Section (Only for Completed jobs) */}
+              {selectedJob.status === "Completed" && selectedJob.rate === 0 && (
+                <section className="rounded-2xl border border-gray-100 bg-orange-50/40 p-4">
+                  <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-orange-600">
+                    Rate &amp; Review Technician
+                  </h3>
+
+                  <div className="mb-3 flex items-center gap-3">
+                    <span className="text-sm font-semibold text-gray-700">Rating:</span>
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setRating(star)}
+                          className={`text-3xl transition ${
+                            rating >= star
+                              ? "text-yellow-400"
+                              : "text-gray-300 hover:text-yellow-200"
+                          }`}
+                        >
+                          ★
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <textarea
+                    className="mb-3 w-full rounded-xl border border-gray-200 bg-white p-3 text-sm outline-none transition focus:border-gray-400 focus:ring-4 focus:ring-gray-100"
+                    rows="3"
+                    placeholder="Share your experience working with this technician..."
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    disabled={reviewStatus === "Review submitted successfully!"}
+                  />
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <span
+                      className={`text-sm font-semibold ${
+                        reviewStatus.includes("successfully")
+                          ? "text-emerald-600"
+                          : "text-rose-500"
+                      }`}
+                    >
+                      {reviewStatus}
+                    </span>
+
+                    {reviewStatus !== "Review submitted successfully!" && (
+                      <button
+                        type="button"
+                        onClick={submitReview}
+                        disabled={isSubmittingReview || rating === 0 || !reviewText.trim()}
+                        className="w-full rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                      >
+                        {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                      </button>
+                    )}
+                  </div>
+                </section>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 border-t border-gray-100 bg-orange-50/30 px-6 py-4">
+              <button
+                className="rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600 active:scale-[0.98]"
+                onClick={() => setSelectedJob(null)}
               >
                 Close
               </button>
@@ -553,7 +436,6 @@ export default function RequestHistoryTable() {
           </div>
         </div>
       )}
-
-    </div>
+    </>
   );
 }

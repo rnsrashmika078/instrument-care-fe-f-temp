@@ -12,7 +12,8 @@ import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Technician from "./Pages/Technician";
 import Contact from "./Pages/Contact";
-import Login from "./Pages/Auth/login";
+// import Login from "./Pages/Auth/login";
+import CiLoginRedirect from "./Components/auth/CiLoginRedirect";
 import Technician_Registration from "./Pages/Auth/Technician-Registration";
 import Technician_Dashboard from "./Pages/Technician/Dashboard";
 import User_Dashboard from "./Pages/Owner/Dashboard";
@@ -27,6 +28,7 @@ import ServiceRequest from "./Pages/Owner/ServiceRequest";
 import RequestHistory from "./Pages/Owner/RequestHistory";
 import MyRequest from "./Pages/Owner/MyRequest";
 import VerifyEmail from "./Pages/Auth/VerifyEmail";
+import SupervisorConsentPage from "./Pages/Supervisor/Consent";
 import EmailEntryForgotPassword from "./Pages/Auth/Email-Entry-Forget-Password";
 import EmailSendForgotPassword from "./Pages/Auth/Email-Send-Forget-Password";
 import SetNewPasswordForgotPassword from "./Pages/Auth/Set-New-Password-Forget-Password";
@@ -36,7 +38,9 @@ import All_Instruments from "./Pages/admin/Instruments";
 import All_Service_Requests from "./Pages/admin/Service_Requests";
 import All_Technicians from "./Pages/admin/Technicians";
 import All_Users from "./Pages/admin/Users";
+import SupervisorView from "./Pages/admin/SupervisorView";
 import UserRegistration from "./Pages/Auth/User-Registration";
+import InstituteRegistration from "./Pages/Auth/Institute-Registration";
 import View_Statistics from "./Pages/admin/View_Statistics";
 
 // 🔹 import ProtectedRoute
@@ -66,17 +70,18 @@ const routerBase = import.meta.env.BASE_URL.replace(/\/$/, "") || "/";
 export default function App() {
   return (
     <Router basename={routerBase}>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          toastStyle={{ width: "440px" }}
+        />
       <Routes>
         {/* ===== Common Routes ===== */}
         {/* <Route path="/" element={<Home />} /> */}
@@ -87,13 +92,22 @@ export default function App() {
         {/* ===== Auth Routes ===== */}
         <Route path="/sso" element={<SsoHandler />} />
         <Route path="/auth/logout" element={<LogoutHandler />} />
-        <Route path="/auth/login" element={<Login />} />
+        {/* <Route path="/auth/login" element={<Login />} /> */}
+        {/* Sign-in now happens on the CodeIgniter side. Any visit to the old
+            /auth/login URL (bookmarks, ProtectedRoute, the "*" catch-all)
+            is forwarded to the CI login instead of rendering a React page. */}
+        <Route path="/auth/login" element={<CiLoginRedirect />} />
         <Route path="/auth/user-registration" element={<UserRegistration />} />
+        <Route
+          path="/auth/institute-registration"
+          element={<InstituteRegistration />}
+        />
         <Route
           path="/auth/tech-registration"
           element={<Technician_Registration />}
         />
         <Route path="/auth/verify-email" element={<VerifyEmail />} />
+        <Route path="/supervisor/consent/:token" element={<SupervisorConsentPage />} />
         <Route
           path="/auth/email-entry-forgot-password"
           element={<EmailEntryForgotPassword />}
@@ -149,6 +163,15 @@ export default function App() {
         />
 
         <Route
+          path="/admin/supervisor-view/:userId"
+          element={
+            <ProtectedRoute allow={[1]}>
+              <SupervisorView />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/admin/owners"
           element={
             <ProtectedRoute allow={[1]}>
@@ -170,7 +193,7 @@ export default function App() {
         <Route
           path="/tech/dashboard"
           element={
-            <ProtectedRoute allow={[1, 10]}>
+            <ProtectedRoute allow={[10]}>
               <Technician_Dashboard />
             </ProtectedRoute>
           }
@@ -178,7 +201,7 @@ export default function App() {
         <Route
           path="/tech/service-request"
           element={
-            <ProtectedRoute allow={[1, 10]}>
+            <ProtectedRoute allow={[10]}>
               <Service_Request />
             </ProtectedRoute>
           }
@@ -186,7 +209,7 @@ export default function App() {
         <Route
           path="/tech/profile"
           element={
-            <ProtectedRoute allow={[1, 10]}>
+            <ProtectedRoute allow={[10]}>
               <Technician_Profile />
             </ProtectedRoute>
           }
@@ -194,7 +217,7 @@ export default function App() {
         <Route
           path="/tech/all-service-request"
           element={
-            <ProtectedRoute allow={[1, 10]}>
+            <ProtectedRoute allow={[10]}>
               <AllServiceRequestPage />
             </ProtectedRoute>
           }
@@ -202,7 +225,7 @@ export default function App() {
         <Route
           path="/tech/all-job-summary"
           element={
-            <ProtectedRoute allow={[1, 10]}>
+            <ProtectedRoute allow={[10]}>
               <AllJobSummaryPage />
             </ProtectedRoute>
           }
@@ -210,7 +233,7 @@ export default function App() {
         <Route
           path="/tech/accept-service-request"
           element={
-            <ProtectedRoute allow={[1, 10]}>
+            <ProtectedRoute allow={[10]}>
               <Accept_Service_Request />
             </ProtectedRoute>
           }
@@ -218,7 +241,7 @@ export default function App() {
         <Route
           path="/tech/reject-service-request"
           element={
-            <ProtectedRoute allow={[1, 10]}>
+            <ProtectedRoute allow={[10]}>
               <Reject_Service_Request />
             </ProtectedRoute>
           }
@@ -228,7 +251,7 @@ export default function App() {
         <Route
           path="/user/dashboard"
           element={
-            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9]}>
+            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}>
               <User_Dashboard />
             </ProtectedRoute>
           }
@@ -236,7 +259,7 @@ export default function App() {
         <Route
           path="/user/view-profile/:id"
           element={
-            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9]}>
+            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}>
               <ViewProfile />
             </ProtectedRoute>
           }
@@ -245,7 +268,7 @@ export default function App() {
         <Route
           path="/user/service-request/:id"
           element={
-            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9]}>
+            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}>
               <ServiceRequest />
             </ProtectedRoute>
           }
@@ -254,7 +277,7 @@ export default function App() {
         <Route
           path="/user/service-history/:id"
           element={
-            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9]}>
+            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}>
               <RequestHistory />
             </ProtectedRoute>
           }
@@ -263,13 +286,14 @@ export default function App() {
         <Route
           path="/user/my-request"
           element={
-            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9]}>
+            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}>
               <MyRequest />
             </ProtectedRoute>
           }
         />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/" element={<Navigate to="/auth/login" replace />} />
+        <Route path="*" element={<Navigate to="/auth/login" replace />} />
       </Routes>
     </Router>
   );
