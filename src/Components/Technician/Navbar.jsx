@@ -14,7 +14,7 @@ const primaryBtn =
 const menuLink =
   "flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-gray-50 hover:text-gray-900";
 
-export default function Navbar() {
+export default function Navbar({ hideTitle = false, hideClientView = false }) {
   const navigate = useNavigate();
   const [userOpen, setUserOpen] = useState(false);
   const [userName, setUserName] = useState("");
@@ -74,21 +74,25 @@ export default function Navbar() {
           >
             <img src={NationalLogo} alt="National Logo" className="h-9 w-auto sm:h-12" />
             <img src={NsfLogo} alt="NSF Logo" className="h-7 w-auto sm:h-10" />
-            <span className="ml-1 hidden border-l border-gray-200 pl-3 text-lg font-extrabold leading-tight text-gray-900 font-poppins sm:block">
-              Instrument Care
-            </span>
+            {!hideTitle ? (
+              <span className="ml-1 hidden border-l border-gray-200 pl-3 text-lg font-extrabold leading-tight text-gray-900 font-poppins sm:block">
+                Instrument Care
+              </span>
+            ) : null}
           </button>
 
           {/* RIGHT: Client View + user menu */}
           <div className="flex items-center gap-2 sm:gap-3 sm:flex-shrink-0">
-            <button
-              type="button"
-              onClick={() => navigate("/user/dashboard")}
-              className={primaryBtn}
-            >
-              <Monitor className="h-4 w-4" />
-              Client View
-            </button>
+            {!hideClientView ? (
+              <button
+                type="button"
+                onClick={() => navigate("/user/dashboard")}
+                className={primaryBtn}
+              >
+                <Monitor className="h-4 w-4" />
+                Client View
+              </button>
+            ) : null}
 
             <div className="relative">
               <button

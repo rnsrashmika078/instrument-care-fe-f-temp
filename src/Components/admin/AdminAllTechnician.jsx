@@ -1,5 +1,6 @@
 import { API_BASE } from "../../config";
 import { formatPhone } from "../utils/phone";
+import { formatDate } from "../utils/format";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -339,6 +340,7 @@ export default function AllTechnicianTable({ usersData }) {
                 <Th>Email</Th>
                 <Th>Contact</Th>
                 <Th>Organization</Th>
+                <Th>Registered At</Th>
                 <Th>Status</Th>
                 <Th>Supervisor</Th>
                 <Th align="center">Actions</Th>
@@ -379,6 +381,11 @@ export default function AllTechnicianTable({ usersData }) {
                     <Td>
                       <span className="text-gray-600">
                         {user.institute_name || "—"}
+                      </span>
+                    </Td>
+                    <Td>
+                      <span className="whitespace-nowrap text-gray-600">
+                        {formatDate(user.created || user.created_at) || "—"}
                       </span>
                     </Td>
                     <Td>

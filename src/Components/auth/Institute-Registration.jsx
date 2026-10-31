@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { API_BASE, HOME_BASE } from "../../config";
+import InstituteRegistrationSuccess from "../../Pages/Auth/Institute-Registration-Success";
 import { toast } from "react-toastify";
 import RegCrumb from "./RegCrumb";
 import {
@@ -87,7 +88,7 @@ export default function InstituteRegistration() {
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [fieldErrors, setFieldErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [redirecting, setRedirecting] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
 
   const setValue = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -200,7 +201,7 @@ export default function InstituteRegistration() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isLoading || redirecting) return;
+    if (isLoading) return;
 
     const errors = validate();
     setFieldErrors(errors);
@@ -224,15 +225,12 @@ export default function InstituteRegistration() {
 
       if (response.ok && (result.status === "success" || result.message)) {
         toast.success(
-          result.message || "Institute registration submitted successfully.",
+          "Registration submitted successfully. Please check your email and spam folder for the next steps.",
           { autoClose: 5000 },
         );
         setFormData(INITIAL_FORM);
         setIsLoading(false);
-        setRedirecting(true);
-        setTimeout(() => {
-          window.location.href = `${HOME_BASE}/user_authentication`;
-        }, 2000);
+        setIsRegistered(true);
         return;
       }
 
@@ -254,6 +252,10 @@ export default function InstituteRegistration() {
       setIsLoading(false);
     }
   };
+
+  if (isRegistered) {
+    return <InstituteRegistrationSuccess />;
+  }
 
   const showOther = formData.institution_type === "Other";
 
@@ -642,16 +644,11 @@ export default function InstituteRegistration() {
 
             <button
               type="submit"
-              disabled={isLoading || redirecting}
+              disabled={isLoading}
               aria-busy={isLoading}
               className="w-full h-[50px] rounded-[10px] bg-[#EE9310] border-none text-white text-base font-bold uppercase tracking-[0.3px] cursor-pointer transition-all duration-250 hover:bg-[#d88106] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-[#EE9310]"
             >
-              {redirecting ? (
-                <span className="inline-flex items-center justify-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Redirecting to login...
-                </span>
-              ) : isLoading ? (
+              {isLoading ? (
                 <span className="inline-flex items-center justify-center gap-2">
                   <Loader2 className="h-5 w-5 animate-spin" />
                   Submitting...

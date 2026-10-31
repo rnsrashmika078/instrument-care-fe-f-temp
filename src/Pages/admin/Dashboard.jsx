@@ -1,51 +1,53 @@
-import { fetchWithAuth } from '../../Components/utils/api';
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '../../Components/Technician/Navbar';
 import Admin_Sidebar from '../../Components/admin/Sidebar';
 import AdminDashboardStats from '../../Components/admin/AdminDashboardStstus';
-import AdminDashboardLineChart from '../../Components/admin/AdminServiceRequestLineChart';
 import Footer from '../../Components/Common/Footer';
-import BG from '../../assets/images/technician-dashboard-bg-4.jpg';
-import AdminDashboardTechnicianViewStats from '../../Components/admin/AdminDashboardTechnicianViewStats';
-import SearchTrendsChart from '../../Components/admin/SearchTrendCharts';
+import ReportCharts from '../../Components/admin/reports/ReportCharts';
+import { fetchWithAuth } from '../../Components/utils/api';
 import { API_BASE } from '../../config';
 
 export default function Admin_Dashboard() {
-  const [chartData, setChartData] = useState([]);
-  const [chartLoading, setChartLoading] = useState(true);
-  const token = sessionStorage.getItem("token");
+  const [report, setReport] = useState({});
+  const [chartsLoading, setChartsLoading] = useState(true);
+  const [chartsError, setChartsError] = useState('');
 
-  // 🔥 Fetch line chart data from backend
   useEffect(() => {
     let active = true;
 
-    const fetchChartData = async () => {
+    const fetchReport = async () => {
       try {
-        const response = await fetchWithAuth(`${API_BASE}/admin/line-chart`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            }
-          }
-        );
+        const response = await fetchWithAuth(`${API_BASE}/admin/reports`, {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+        });
+
+        if (!response) return;
+
+        if (!response.ok) {
+          throw new Error(`Report request failed (${response.status})`);
+        }
+
         const data = await response.json();
 
-        //  Set backend response to chartData
-        if (active) setChartData(Array.isArray(data) ? data : []);
+        if (active) setReport(data ?? {});
       } catch (error) {
-        console.error('Failed to fetch line chart data:', error);
+        console.error('Failed to fetch dashboard report:', error);
+
+        if (active) {
+          setChartsError('Unable to load the National Statistics charts.');
+        }
       } finally {
-        if (active) setChartLoading(false);
+        if (active) setChartsLoading(false);
       }
     };
 
-    fetchChartData();
+    fetchReport();
 
     return () => {
       active = false;
     };
-  }, [token]);
+  }, []);
 
   return (
     <>
@@ -71,13 +73,25 @@ export default function Admin_Dashboard() {
 
             <AdminDashboardStats />
 
-            <div className="mt-6 grid gap-5 xl:grid-cols-[1.4fr_1fr]">
-              <AdminDashboardLineChart data={chartData} loading={chartLoading} />
-              <AdminDashboardTechnicianViewStats />
-            </div>
-
             <div className="mt-6">
-              <SearchTrendsChart />
+              {chartsError ? (
+                <div className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                  {chartsError}
+                </div>
+              ) : null}
+
+              {chartsLoading ? (
+                <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="h-80 animate-pulse rounded-[1.5rem] border border-gray-200 bg-white"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <ReportCharts report={report} />
+              )}
             </div>
           </main>
       </div>

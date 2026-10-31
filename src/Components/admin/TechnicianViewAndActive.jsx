@@ -162,7 +162,12 @@ export default function TechnicianViewAndActive() {
                                     </div>
                                 </Td>
                                 <Td align="right">
-                                    <Metric value={data.total_searches} />
+                                    <Metric
+                                        value={
+                                            data.total_impressions ??
+                                            data.total_searches
+                                        }
+                                    />
                                 </Td>
                                 <Td>
                                     <span className="whitespace-nowrap text-xs text-gray-500">

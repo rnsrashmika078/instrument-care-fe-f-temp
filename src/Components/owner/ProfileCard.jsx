@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Eye } from "lucide-react";
 import DefaultProfileImage from "../../assets/images/profile-image.jpeg";
 import { assetUrl } from "../utils/api";
 import { API_BASE } from "../../config";
@@ -31,6 +32,8 @@ function DetailRow({ label, value }) {
 export default function ProfileCard({ onTechLoaded }) {
   const { id } = useParams(); // get technician id from URL
   const [tech, setTech] = useState(null);
+  const [views, setViews] = useState(0);
+  const impressionLogged = useRef(false);
 
   const token = sessionStorage.getItem("token");
 
@@ -50,9 +53,35 @@ export default function ProfileCard({ onTechLoaded }) {
         if (!response.ok) throw new Error("Failed to fetch technician");
         const data = await response.json();
         setTech(data);
+        setViews(Number(data.impressions) || 0);
         // Technical Expertise needs this userId but is rendered outside this
         // card, so hand it up instead of fetching the same endpoint twice.
         onTechLoaded?.(data.technician_user_id || data.user_id || "");
+
+        // Record this profile view once per mount (mirrors instrument impressions).
+        if (!impressionLogged.current) {
+          impressionLogged.current = true;
+          try {
+            const impressionResponse = await fetch(
+              `${API_BASE}/user/dashboard/${id}/impression`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            if (impressionResponse.ok) {
+              const impressionData = await impressionResponse.json();
+              if (typeof impressionData?.impressions === "number") {
+                setViews(impressionData.impressions);
+              }
+            }
+          } catch (impressionError) {
+            console.error("Error recording profile view:", impressionError);
+          }
+        }
       } catch (error) {
         console.error("Error fetching technician:", error);
       }
@@ -110,6 +139,13 @@ export default function ProfileCard({ onTechLoaded }) {
             {tech.district}
           </span>
         )}
+        <span
+          className="mt-3 inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-orange-700 ring-1 ring-inset ring-orange-100"
+          title="Total profile views"
+        >
+          <Eye className="h-3 w-3" aria-hidden="true" />
+          {views.toLocaleString()} view{views === 1 ? "" : "s"}
+        </span>
       </div>
 
       <div className="border-t border-gray-100" />

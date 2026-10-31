@@ -13,7 +13,7 @@ function decodeJwt(token) {
         .join(""),
     );
     return JSON.parse(jsonPayload);
-  } catch (e) {
+  } catch {
     return null;
   }
 }
@@ -27,14 +27,17 @@ function getDashboardPath(role) {
 
 // The instrument (CodeIgniter) side can ask for a specific portal page after the
 // handshake - e.g. the public "Hire Technician" button linking straight to
-// /user/view-profile/:id. Only owner routes are honoured, and only with
+// /user/view-profile/:id, or the "Statistics" shortcut.
+// Only owner routes and the statistics page are honoured, and only with
 // id-ish segments, so a crafted value cannot redirect off the portal.
 function getRequestedPath(rawTarget) {
   if (!rawTarget) return null;
 
   const target = `/${String(rawTarget).replace(/^\/+/, "")}`;
 
-  return /^\/user(?:\/[A-Za-z0-9_-]+)*$/.test(target) ? target : null;
+  return /^(?:\/user(?:\/[A-Za-z0-9_-]+)*|\/statistics)$/.test(target)
+    ? target
+    : null;
 }
 
 export default function SsoHandler() {
@@ -66,6 +69,11 @@ export default function SsoHandler() {
     sessionStorage.setItem("isLoggedIn", "true");
     sessionStorage.setItem("role", role);
     sessionStorage.setItem("user_id", userId);
+    if (payload.institute_id != null) {
+      sessionStorage.setItem("institute_id", String(payload.institute_id));
+    } else {
+      sessionStorage.removeItem("institute_id");
+    }
     if (payload.technician_id) {
       sessionStorage.setItem("technician_id", String(payload.technician_id));
     }

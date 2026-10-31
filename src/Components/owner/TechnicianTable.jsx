@@ -9,8 +9,8 @@ import {
   ChevronRight,
   Microscope,
   Search,
-  Send,
   SlidersHorizontal,
+  SquareArrowOutUpRight,
 } from "lucide-react";
 import DefaultProfileImage from "../../assets/images/profile-image.jpeg";
 import { fetchWithAuth, assetUrl } from "../utils/api";
@@ -18,7 +18,7 @@ import { dateOnly } from "../utils/format";
 import { API_BASE } from "../../config";
 import { StatusPill, TableEmpty } from "../admin/TableUI";
 
-const RECORDS_PER_PAGE = 10;
+const RECORDS_PER_PAGE = 12;
 
 const ACTIVE_REQUEST_STATUSES = ["pending", "in progress"];
 
@@ -70,24 +70,27 @@ function ResultRow({ tech, myReq, isOwnProfile, onViewProfile }) {
     : false;
 
   return (
-    <article className="group flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition duration-200 hover:border-orange-200 hover:shadow-md sm:flex-row sm:items-center sm:p-5">
-      <div className="relative shrink-0 self-start sm:self-center">
+    <article className="group relative flex h-full min-w-0 flex-col rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md sm:p-5">
+      <div className="relative mx-auto h-20 w-20 shrink-0 sm:h-24 sm:w-24">
         <img
           src={imageUrl}
           alt={fullName}
-          className="h-14 w-14 rounded-2xl object-cover ring-1 ring-gray-100 sm:h-16 sm:w-16"
+          className="h-full w-full rounded-full object-cover ring-4 ring-gray-50 transition-transform duration-300 group-hover:scale-105"
         />
         <span
           title="Approved technician"
-          className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-emerald-500 ring-2 ring-white"
+          className="absolute bottom-0 right-0 grid h-5 w-5 place-items-center rounded-full bg-emerald-500 ring-2 ring-white sm:h-6 sm:w-6"
         >
-          <BadgeCheck className="h-3 w-3 text-white" aria-hidden="true" />
+          <BadgeCheck className="h-3.5 w-3.5 text-white sm:h-4 sm:w-4" aria-hidden="true" />
         </span>
       </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="truncate text-base font-bold text-gray-900" title={fullName}>
+      <div className="mt-3 min-w-0 sm:mt-4">
+        <div className="flex flex-wrap items-center justify-center gap-1.5">
+          <h3
+            className="min-w-0 truncate text-base font-bold text-gray-900 sm:text-lg"
+            title={fullName}
+          >
             {fullName}
           </h3>
           {isOwnProfile && (
@@ -95,69 +98,72 @@ function ResultRow({ tech, myReq, isOwnProfile, onViewProfile }) {
               You
             </span>
           )}
-          {myReq && (
-            <span
-              title={`Request SR/${myReq.id} raised on ${dateOnly(myReq.created_at)}`}
-              className="inline-flex"
-            >
-              <StatusPill status={myReq.status} />
-            </span>
-          )}
         </div>
 
-        <p className="mt-0.5 truncate text-sm font-medium text-orange-600">
+        <p className="mt-1 truncate text-xs font-medium text-orange-600 sm:text-sm">
           {tech.designation || "Technician"}
         </p>
 
-        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500">
-          {tech.institute_name && (
-            <span className="inline-flex min-w-0 items-center gap-1.5">
-              <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
-              <span className="truncate" title={tech.institute_name}>
-                {tech.institute_name}
-              </span>
-            </span>
-          )}
-          {tags.length > 0 && (
-            <span className="inline-flex min-w-0 items-center gap-1.5">
-              <Microscope className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
-              <span className="flex min-w-0 flex-wrap gap-1">
-                {tags.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="max-w-[10rem] truncate rounded-md bg-gray-50 px-1.5 py-0.5 text-[11px] font-medium text-gray-600 ring-1 ring-inset ring-gray-200"
-                  >
-                    {tag}
-                  </span>
-                ))}
-                {tags.length > 3 && (
-                  <span className="rounded-md bg-gray-50 px-1.5 py-0.5 text-[11px] font-semibold text-gray-500 ring-1 ring-inset ring-gray-200">
-                    +{tags.length - 3}
-                  </span>
-                )}
-              </span>
-            </span>
-          )}
-        </div>
+        {myReq && (
+          <span
+            title={`Request SR/${myReq.id} raised on ${dateOnly(myReq.created_at)}`}
+            className="mt-2 inline-flex"
+          >
+            <StatusPill status={myReq.status} />
+          </span>
+        )}
       </div>
 
-      <div className="flex shrink-0 gap-2 pt-1 sm:pt-0">
+      <div className="mt-3 flex flex-1 flex-col gap-2 border-t border-gray-100 pt-3 text-xs text-gray-600 sm:mt-4 sm:pt-4 sm:text-sm">
+        <div className="flex items-center justify-center gap-2">
+          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-orange-50 text-orange-600">
+            <Building2 className="h-3.5 w-3.5" aria-hidden="true" />
+          </span>
+          <span className="min-w-0 truncate" title={tech.institute_name || "-"}>
+            {tech.institute_name || "-"}
+          </span>
+        </div>
+
+        {tags.length > 0 && (
+          <div className="flex flex-wrap items-center justify-center gap-1">
+            <Microscope
+              className="h-3.5 w-3.5 shrink-0 text-gray-400"
+              aria-hidden="true"
+            />
+            {tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="max-w-[8rem] truncate rounded-md bg-gray-50 px-1.5 py-0.5 text-[11px] font-medium text-gray-600 ring-1 ring-inset ring-gray-200"
+                title={tag}
+              >
+                {tag}
+              </span>
+            ))}
+            {tags.length > 3 && (
+              <span className="rounded-md bg-gray-50 px-1.5 py-0.5 text-[11px] font-semibold text-gray-500 ring-1 ring-inset ring-gray-200">
+                +{tags.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+
+        {tech.bio && (
+          <p className="line-clamp-2 text-xs leading-relaxed text-gray-500">
+            {tech.bio}
+          </p>
+        )}
+      </div>
+
+      <div className="mt-auto space-y-2 pt-4">
         {isOwnProfile ? (
           <span
             title="You cannot request service from yourself"
-            className="flex flex-1 cursor-not-allowed items-center justify-center rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-400 sm:flex-none"
+            className="flex w-full cursor-not-allowed items-center justify-center rounded-xl bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-400 sm:px-4 sm:py-2.5 sm:text-sm"
           >
             This is you
           </span>
         ) : (
           <>
-            <button
-              type="button"
-              onClick={() => onViewProfile(tech.user_id, tech.id)}
-              className="flex flex-1 items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 active:scale-[0.98] sm:flex-none"
-            >
-              View
-            </button>
             <Link
               to={`/user/service-request/${tech.id}`}
               title={
@@ -165,12 +171,19 @@ function ResultRow({ tech, myReq, isOwnProfile, onViewProfile }) {
                   ? "You already have an active request with this technician"
                   : undefined
               }
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600 active:scale-[0.98] sm:flex-none"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-orange-600 active:scale-[0.98] sm:px-4 sm:py-2.5 sm:text-sm"
             >
-              <Send className="h-3.5 w-3.5" aria-hidden="true" />
-              Request
-              <ArrowUpRight className="h-3.5 w-3.5 opacity-80" aria-hidden="true" />
+              Service Request
+              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </Link>
+            <button
+              type="button"
+              onClick={() => onViewProfile(tech.user_id, tech.id)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:border-gray-300 hover:bg-orange-50 hover:text-orange-700 active:scale-[0.98] sm:px-4 sm:py-2.5 sm:text-sm"
+            >
+              View Profile
+              <SquareArrowOutUpRight className="h-4 w-4" aria-hidden="true" />
+            </button>
           </>
         )}
       </div>
@@ -242,18 +255,17 @@ function Pager({ page, totalPages, total, onPage }) {
   );
 }
 
-function RowSkeleton() {
+function CardSkeleton() {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:p-5">
-      <div className="h-14 w-14 shrink-0 animate-pulse rounded-2xl bg-gray-100 sm:h-16 sm:w-16" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 w-1/3 animate-pulse rounded bg-gray-100" />
-        <div className="h-3 w-1/4 animate-pulse rounded bg-gray-100" />
-        <div className="h-3 w-1/2 animate-pulse rounded bg-gray-100" />
-      </div>
-      <div className="flex gap-2">
-        <div className="h-10 w-20 animate-pulse rounded-xl bg-gray-100" />
-        <div className="h-10 w-24 animate-pulse rounded-xl bg-orange-100" />
+    <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm sm:p-5">
+      <div className="mx-auto h-20 w-20 animate-pulse rounded-full bg-orange-100 sm:h-24 sm:w-24" />
+      <div className="mx-auto mt-3 h-4 w-2/3 animate-pulse rounded bg-orange-100 sm:mt-4" />
+      <div className="mx-auto mt-2 h-3 w-1/2 animate-pulse rounded bg-orange-100" />
+      <div className="mx-auto mt-3 h-3 w-5/6 animate-pulse rounded bg-orange-100 sm:mt-4" />
+      <div className="mx-auto mt-1.5 h-3 w-2/3 animate-pulse rounded bg-orange-100" />
+      <div className="mt-auto space-y-2 pt-4 sm:pt-5">
+        <div className="h-9 w-full animate-pulse rounded-xl bg-orange-100 sm:h-10" />
+        <div className="h-9 w-full animate-pulse rounded-xl bg-orange-100 sm:h-10" />
       </div>
     </div>
   );
@@ -515,9 +527,9 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
       {/* Results */}
       <div>
           {loading ? (
-            <div className="space-y-3">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <RowSkeleton key={i} />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+              {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                <CardSkeleton key={i} />
               ))}
             </div>
           ) : technicians.length === 0 ? (
@@ -537,7 +549,7 @@ export default function TechnicianTable({ searchTerm, setSearchTerm }) {
             </div>
           ) : (
             <>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                 {currentRecords.map((tech, index) => (
                   <ResultRow
                     key={tech.user_id ?? tech.id ?? index}

@@ -45,7 +45,7 @@ export default function All_Technicians() {
           <main className="min-w-0 flex-1 pt-14 md:pt-0">
           {loading ? (
             <TableCard>
-              <TableSkeleton rows={8} columns={6} />
+              <TableSkeleton rows={8} columns={9} />
             </TableCard>
           ) : (
             <AllTechnicianTable usersData={technicians} />

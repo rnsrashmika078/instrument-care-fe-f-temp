@@ -33,6 +33,7 @@ import EmailEntryForgotPassword from "./Pages/Auth/Email-Entry-Forget-Password";
 import EmailSendForgotPassword from "./Pages/Auth/Email-Send-Forget-Password";
 import SetNewPasswordForgotPassword from "./Pages/Auth/Set-New-Password-Forget-Password";
 import PasswordResetedForgotPassword from "./Pages/Auth/Password-Reseted-Forget-Password";
+import InstituteRegistrationSuccess from "./Pages/Auth/Institute-Registration-Success";
 import Admin_Dashboard from "./Pages/admin/Dashboard";
 import All_Instruments from "./Pages/admin/Instruments";
 import All_Service_Requests from "./Pages/admin/Service_Requests";
@@ -42,6 +43,7 @@ import SupervisorView from "./Pages/admin/SupervisorView";
 import UserRegistration from "./Pages/Auth/User-Registration";
 import InstituteRegistration from "./Pages/Auth/Institute-Registration";
 import View_Statistics from "./Pages/admin/View_Statistics";
+import Reports from "./Pages/admin/Reports";
 
 // 🔹 import ProtectedRoute
 import ProtectedRoute from "./Components/auth/ProtectedRoute";
@@ -101,6 +103,10 @@ export default function App() {
         <Route
           path="/auth/institute-registration"
           element={<InstituteRegistration />}
+        />
+        <Route
+          path="/auth/institute-registration-success"
+          element={<InstituteRegistrationSuccess />}
         />
         <Route
           path="/auth/tech-registration"
@@ -185,6 +191,15 @@ export default function App() {
           element={
             <ProtectedRoute allow={[1]}>
               <View_Statistics />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/statistics"
+          element={
+            <ProtectedRoute allow={[1, 2, 3, 4, 5, 6, 7, 8, 9]}>
+              <Reports />
             </ProtectedRoute>
           }
         />
