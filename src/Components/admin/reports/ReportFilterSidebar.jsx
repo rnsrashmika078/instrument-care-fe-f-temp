@@ -65,7 +65,7 @@ export default function ReportFilterSidebar({
         <div className="border-b border-gray-100 px-3 py-3">
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm font-semibold text-gray-700">
-              Date range
+              Reporting Period
             </span>
             {hasDateFilter ? (
               <button
